@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_city_list"
+        android:icon="@drawable/ic_menu"
+        android:title="Города" />
+
+    <item
+        android:id="@+id/nav_custom_tab"
+        android:icon="@drawable/ic_custom_circle"
+        android:title="Европа" />
+</menu>
