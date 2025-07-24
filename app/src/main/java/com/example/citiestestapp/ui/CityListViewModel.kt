@@ -6,7 +6,6 @@ import com.example.citiestestapp.data.City
 
 class CityListViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    //НАДО СДЕЛАТЬ ЧТОБЫ СПИСОК СОХРАНЯЛСЯ
     init {
         println("ViewModel created! Saved state: ${savedStateHandle.get<List<City>>(CITIES_KEY)}")
     }
@@ -33,9 +32,12 @@ class CityListViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
             val item = currentList.removeAt(from)
             currentList.add(to, item)
 
-            // Сохраняем новое состояние
             println("Swapped items: $from -> $to. New list: $currentList")
             savedStateHandle[CITIES_KEY] = currentList
         }
+    }
+
+    fun setCityList(newList: List<City>) {
+        savedStateHandle[CITIES_KEY] = newList
     }
 }

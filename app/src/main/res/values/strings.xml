@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">CitiesTestApp</string>
+    <string name="full_list_name">Полное название списка</string>
+    <string name="blue_color">Синий</string>
+    <string name="green_color">Зеленый</string>
+    <string name="red_color">Красный</string>
+    <string name="orange_color">Оранжевый</string>
+    <string name="violet_color">Фиолетовый</string>
+    <string name="max_cities_message">Максимум 5 городов</string>
+    <string name="empty_fields_message">Заполните все поля и выберите города</string>
+    <string name="create_cities_list_message">Создать список городов</string>
 </resources>
