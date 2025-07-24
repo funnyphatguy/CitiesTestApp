@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.citiestestapp.R
 import com.example.citiestestapp.data.CityList
@@ -51,9 +52,9 @@ class CityListCarouselAdapter(
         fun bind(cityList: CityList, isSelected: Boolean) {
             val tvShortName = itemView.findViewById<TextView>(R.id.tvShortName)
             tvShortName.text = cityList.shortName
-            val bg = itemView.background as? GradientDrawable
-            bg?.setColor(cityList.color)
-            // Меняем размер
+            val bg = tvShortName.background as? GradientDrawable
+            val colorInt = ContextCompat.getColor(itemView.context, cityList.color)
+            bg?.setColor(colorInt)
             val scale = if (isSelected) 1.2f else 1.0f
             itemView.animate().scaleX(scale).scaleY(scale).setDuration(200).start()
         }

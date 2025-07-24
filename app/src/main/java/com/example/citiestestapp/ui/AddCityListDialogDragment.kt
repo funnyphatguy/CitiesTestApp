@@ -9,7 +9,6 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.example.citiestestapp.R
 import com.example.citiestestapp.data.City
@@ -31,7 +30,7 @@ class AddCityListDialogFragment(
         _binding = DialogAddCityListBinding.inflate(LayoutInflater.from(requireContext()))
         val view = binding.root
 
-        selectedColor = ContextCompat.getColor(requireContext(), R.color.color_blue)
+        selectedColor = R.color.color_blue
 
         val colors = listOf(
             getString(R.string.blue_color) to R.color.color_blue,
@@ -53,7 +52,7 @@ class AddCityListDialogFragment(
                 position: Int,
                 id: Long
             ) {
-                selectedColor = ContextCompat.getColor(requireContext(), colors[position].second)
+                selectedColor = colors[position].second
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
@@ -67,7 +66,6 @@ class AddCityListDialogFragment(
                         if (selectedCities.size < 5) {
                             selectedCities.add(city)
                         } else {
-                            // Используем buttonView для изменения состояния CheckBox
                             buttonView.isChecked = false
                             Toast.makeText(
                                 requireContext(),
