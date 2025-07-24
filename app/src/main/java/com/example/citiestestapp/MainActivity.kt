@@ -6,8 +6,11 @@ import com.example.citiestestapp.databinding.ActivityMainBinding
 import com.example.citiestestapp.ui.CityListFragment
 import com.example.citiestestapp.ui.CustomMenuFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.lifecycle.ViewModelProvider
+import com.example.citiestestapp.data.CityList
+import com.example.citiestestapp.ui.CityListViewModel
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CustomMenuFragment.OnCityListSelectedListener {
 
     private var _binding: ActivityMainBinding? = null
     private val binding
@@ -35,15 +38,30 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 R.id.nav_custom_tab -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, CustomMenuFragment())
-                        .commit()
-                    true
+                    val fragment = CustomMenuFragment()
+                    fragment.show(supportFragmentManager, "CustomMenuFragment")
+                    false
                 }
 
                 else -> false
             }
         }
+    }
+
+    override fun onCityListSelected(cityList: CityList) {
+        val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        val menu = bottomNavigation.menu
+        val item = menu.findItem(R.id.nav_custom_tab)
+        item.title = cityList.shortName
+        val iconDrawable = resources.getDrawable(R.drawable.ic_custom_circle, null).mutate()
+        if (iconDrawable is android.graphics.drawable.ShapeDrawable) {
+            iconDrawable.paint.color = cityList.color
+        } else if (iconDrawable is android.graphics.drawable.GradientDrawable) {
+            iconDrawable.setColor(cityList.color)
+        }
+        item.icon = iconDrawable
+        val viewModel = ViewModelProvider(this).get(CityListViewModel::class.java)
+        viewModel.setCityList(cityList.cities)
     }
 }
 
