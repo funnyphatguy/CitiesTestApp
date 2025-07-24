@@ -1,36 +1,39 @@
 package com.example.citiestestapp.ui
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.citiestestapp.R
 import com.example.citiestestapp.data.City
 import com.example.citiestestapp.data.CityList
+import com.example.citiestestapp.databinding.FragmentCustomMenuBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import android.widget.TextView
-import com.example.citiestestapp.ui.CenterItemDecoration
-import androidx.lifecycle.ViewModelProvider
 
 class CustomMenuFragment : BottomSheetDialogFragment() {
+    private var _binding: FragmentCustomMenuBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var carouselAdapter: CityListCarouselAdapter
-    private lateinit var rvCarousel: RecyclerView
     private lateinit var cityListsViewModel: CityListsViewModel
     private var selectedListIndex: Int = 0
+    private var bottomSheetBehavior: com.google.android.material.bottomsheet.BottomSheetBehavior<View>? =
+        null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_custom_menu, container, false)
+    ): View {
+        _binding = FragmentCustomMenuBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         cityListsViewModel = ViewModelProvider(requireActivity()).get(CityListsViewModel::class.java)
-        rvCarousel = view.findViewById(R.id.rvCarousel)
-        val tvFullListName = view.findViewById<TextView>(R.id.tvFullListName)
         selectedListIndex = 0
         carouselAdapter = CityListCarouselAdapter(
             emptyList(),
@@ -41,27 +44,33 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
                     selectedListIndex = index
                     carouselAdapter.selectedIndex = selectedListIndex
                     carouselAdapter.notifyDataSetChanged()
-                    tvFullListName.text = cityList.fullName
+                    binding.tvFullListName.text = cityList.fullName
                     cityListSelectedListener?.onCityListSelected(cityList)
                     centerSelectedItem()
                 }
             }
         )
-        rvCarousel.adapter = carouselAdapter
-        rvCarousel.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.rvCarousel.adapter = carouselAdapter
+        binding.rvCarousel.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         carouselAdapter.selectedIndex = selectedListIndex
         carouselAdapter.notifyDataSetChanged()
-        if (rvCarousel.itemDecorationCount == 0) {
-            rvCarousel.post {
-                val recyclerViewWidth = rvCarousel.width
+        if (binding.rvCarousel.itemDecorationCount == 0) {
+            binding.rvCarousel.post {
+                val recyclerViewWidth = binding.rvCarousel.width
                 val itemWidth = resources.getDimensionPixelSize(R.dimen.carousel_item_size)
-                rvCarousel.addItemDecoration(CenterItemDecoration(itemWidth, recyclerViewWidth))
+                binding.rvCarousel.addItemDecoration(
+                    CenterItemDecoration(
+                        itemWidth,
+                        recyclerViewWidth
+                    )
+                )
                 centerSelectedItem()
             }
         } else {
-            rvCarousel.post { centerSelectedItem() }
+            binding.rvCarousel.post { centerSelectedItem() }
         }
-        rvCarousel.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding.rvCarousel.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
@@ -83,7 +92,7 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
                     carouselAdapter.selectedIndex = selectedListIndex
                     carouselAdapter.notifyDataSetChanged()
                     val cityList = lists[selectedListIndex]
-                    tvFullListName.text = cityList.fullName
+                    binding.tvFullListName.text = cityList.fullName
                     cityListSelectedListener?.onCityListSelected(cityList)
                 }
             }
@@ -94,18 +103,21 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
             if (selectedListIndex >= lists.size) selectedListIndex = lists.size - 1
             if (selectedListIndex < 0) selectedListIndex = 0
             carouselAdapter.selectedIndex = selectedListIndex
-            tvFullListName.text = lists.getOrNull(selectedListIndex)?.fullName ?: ""
-            rvCarousel.post {
+            binding.tvFullListName.text = lists.getOrNull(selectedListIndex)?.fullName ?: ""
+            binding.rvCarousel.post {
                 updateCenterItemDecoration()
                 centerSelectedItem()
             }
         }
+        binding.icArrowDown.setOnClickListener {
+            toggleBottomSheetState()
+        }
     }
 
     private fun centerSelectedItem() {
-        val recyclerViewWidth = rvCarousel.width
+        val recyclerViewWidth = binding.rvCarousel.width
         val itemWidth = resources.getDimensionPixelSize(R.dimen.carousel_item_size)
-        val layoutManager = rvCarousel.layoutManager as? LinearLayoutManager
+        val layoutManager = binding.rvCarousel.layoutManager as? LinearLayoutManager
         layoutManager?.scrollToPositionWithOffset(selectedListIndex, (recyclerViewWidth - itemWidth) / 2)
     }
 
@@ -113,22 +125,31 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
         super.onStart()
         val dialog = dialog as? com.google.android.material.bottomsheet.BottomSheetDialog ?: return
         val bottomSheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) ?: return
-        val displayMetrics = resources.displayMetrics
-        val halfScreenHeight = (displayMetrics.heightPixels * 0.5).toInt()
-        bottomSheet.layoutParams.height = halfScreenHeight
+        bottomSheetBehavior =
+            com.google.android.material.bottomsheet.BottomSheetBehavior.from(bottomSheet)
+        bottomSheetBehavior?.state =
+            com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HALF_EXPANDED
+        bottomSheetBehavior?.addBottomSheetCallback(object :
+            com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        })
+        bottomSheet.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
         bottomSheet.requestLayout()
     }
 
     private fun updateCenterItemDecoration() {
-        for (i in rvCarousel.itemDecorationCount - 1 downTo 0) {
-            val deco = rvCarousel.getItemDecorationAt(i)
+        for (i in binding.rvCarousel.itemDecorationCount - 1 downTo 0) {
+            val deco = binding.rvCarousel.getItemDecorationAt(i)
             if (deco is CenterItemDecoration) {
-                rvCarousel.removeItemDecoration(deco)
+                binding.rvCarousel.removeItemDecoration(deco)
             }
         }
-        val recyclerViewWidth = rvCarousel.width
+        val recyclerViewWidth = binding.rvCarousel.width
         val itemWidth = resources.getDimensionPixelSize(R.dimen.carousel_item_size)
-        rvCarousel.addItemDecoration(CenterItemDecoration(itemWidth, recyclerViewWidth))
+        binding.rvCarousel.addItemDecoration(CenterItemDecoration(itemWidth, recyclerViewWidth))
     }
 
     private fun showAddCityListDialog() {
@@ -136,7 +157,7 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
         AddCityListDialogFragment(allCities) { newList ->
             cityListsViewModel.addList(newList)
             carouselAdapter.notifyDataSetChanged()
-            rvCarousel.post {
+            binding.rvCarousel.post {
                 updateCenterItemDecoration()
                 selectedListIndex = cityListsViewModel.getAllLists().size - 1
                 carouselAdapter.selectedIndex = selectedListIndex
@@ -177,5 +198,25 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
     override fun onDetach() {
         super.onDetach()
         cityListSelectedListener = null
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun toggleBottomSheetState() {
+        val behavior = bottomSheetBehavior ?: return
+        when (behavior.state) {
+            com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED -> {
+                behavior.state =
+                    com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
+
+            else -> {
+                behavior.state =
+                    com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+            }
+        }
     }
 }

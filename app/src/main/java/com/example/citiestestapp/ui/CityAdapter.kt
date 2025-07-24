@@ -35,10 +35,14 @@ class CityAdapter(
     }
 
     fun updateItems(newItems: List<City>) {
+        android.util.Log.d("CityAdapter", "updateItems called with: $newItems")
         if (items.size != newItems.size || !items.containsAll(newItems)) {
             items.clear()
             items.addAll(newItems)
+            android.util.Log.d("CityAdapter", "Items updated, calling notifyDataSetChanged")
             notifyDataSetChanged()
+        } else {
+            android.util.Log.d("CityAdapter", "Items are the same, no update needed")
         }
     }
 

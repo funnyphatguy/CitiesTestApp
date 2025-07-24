@@ -38,6 +38,8 @@ class CityListViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
     }
 
     fun setCityList(newList: List<City>) {
+        android.util.Log.d("CityListViewModel", "setCityList called with: $newList")
         savedStateHandle[CITIES_KEY] = newList
+        android.util.Log.d("CityListViewModel", "Updated cityList value: ${_cityList.value}")
     }
 }
