@@ -2,16 +2,16 @@ package com.example.citiestestapp.ui
 
 import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.citiestestapp.R
+import com.example.citiestestapp.databinding.ItemCityListAddBinding
+import com.example.citiestestapp.databinding.ItemCityListCarouselBinding
 import com.example.citiestestapp.model.CityList
 
 class CityListCarouselAdapter(
-    var items: List<CityList>,
+    var dataset: List<CityList>,
     var selectedIndex: Int = 0,
     private val onAddClick: () -> Unit = {},
     private val onItemClick: (CityList) -> Unit = {}
@@ -23,37 +23,42 @@ class CityListCarouselAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position < items.size) TYPE_LIST else TYPE_ADD
+        return if (position < dataset.size) TYPE_LIST else TYPE_ADD
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == TYPE_LIST) {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_city_list_carousel, parent, false)
-            CityListViewHolder(view)
+            val binding = ItemCityListCarouselBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+            CityListViewHolder(binding)
         } else {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_city_list_add, parent, false)
-            AddViewHolder(view)
+            val binding =
+                ItemCityListAddBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            AddViewHolder(binding)
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is CityListViewHolder && position < items.size) {
+        if (holder is CityListViewHolder && position < dataset.size) {
             val isSelected = position == selectedIndex
-            holder.bind(items[position], isSelected)
-            holder.itemView.setOnClickListener { onItemClick(items[position]) }
+            holder.bind(dataset[position], isSelected)
+            holder.itemView.setOnClickListener { onItemClick(dataset[position]) }
         } else if (holder is AddViewHolder) {
             holder.bind()
             holder.itemView.setOnClickListener { onAddClick() }
         }
     }
 
-    override fun getItemCount(): Int = items.size + 1 // +1 для кнопки +
+    override fun getItemCount(): Int = dataset.size + 1 // +1 для кнопки +
 
-    inner class CityListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class CityListViewHolder(private val binding: ItemCityListCarouselBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(cityList: CityList, isSelected: Boolean) {
-            val tvShortName = itemView.findViewById<TextView>(R.id.tvShortName)
-            tvShortName.text = cityList.shortName
-            val bg = tvShortName.background as? GradientDrawable
+            binding.tvShortName.text = cityList.shortName
+            val bg = binding.tvShortName.background as? GradientDrawable
             val colorInt = ContextCompat.getColor(itemView.context, cityList.color)
             bg?.setColor(colorInt)
             val scale = if (isSelected) 1.2f else 1.0f
@@ -61,28 +66,12 @@ class CityListCarouselAdapter(
         }
     }
 
-    inner class AddViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class AddViewHolder(private val binding: ItemCityListAddBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind() {
-            val imageView = itemView.findViewById<android.widget.ImageView>(android.R.id.icon)
-            if (imageView != null) {
-                val bg = imageView.background as? GradientDrawable
-                val yellowColor = ContextCompat.getColor(itemView.context, R.color.color_yellow)
-                bg?.setColor(yellowColor)
-            } else {
-                // Если ImageView не найден по стандартному ID, ищем по layout
-                val container = itemView as? android.widget.FrameLayout
-                container?.let { frameLayout ->
-                    for (i in 0 until frameLayout.childCount) {
-                        val child = frameLayout.getChildAt(i)
-                        if (child is android.widget.ImageView) {
-                            val bg = child.background as? GradientDrawable
-                            val yellowColor = ContextCompat.getColor(itemView.context, R.color.color_yellow)
-                            bg?.setColor(yellowColor)
-                            break
-                        }
-                    }
-                }
-            }
+            val bg = binding.ivAdd.background as? GradientDrawable
+            val yellowColor = ContextCompat.getColor(itemView.context, R.color.color_yellow)
+            bg?.setColor(yellowColor)
         }
     }
 }
