@@ -89,6 +89,10 @@ class AddCityListDialogFragment(
             binding.layoutCities.addView(checkBox)
         }
 
+        binding.btnCancel.setOnClickListener {
+            dismiss()
+        }
+
         binding.btnConfirm.setOnClickListener {
             val shortName = binding.etShortName.text.toString().trim()
             val fullName = binding.etFullName.text.toString().trim()

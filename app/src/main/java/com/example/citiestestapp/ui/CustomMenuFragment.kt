@@ -4,20 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.citiestestapp.R
-import com.example.citiestestapp.model.City
-import com.example.citiestestapp.model.CityList
-import com.example.citiestestapp.databinding.FragmentCustomMenuBinding
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.Lifecycle
-import kotlinx.coroutines.launch
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
-import com.example.citiestestapp.databinding.DialogAddCityListBinding
+import androidx.recyclerview.widget.RecyclerView
+import com.example.citiestestapp.R
+import com.example.citiestestapp.databinding.FragmentCustomMenuBinding
+import com.example.citiestestapp.model.City
+import com.example.citiestestapp.model.CityList
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.launch
 
 class CustomMenuFragment : BottomSheetDialogFragment() {
 
@@ -46,7 +45,7 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
             emptyList(),
             onAddClick = { showAddCityListDialog() },
             onItemClick = { cityList ->
-                val lists = carouselAdapter.items
+                val lists = carouselAdapter.dataset
                 val index = lists.indexOf(cityList)
                 if (index != -1) {
                     selectedListIndex = index
@@ -92,7 +91,7 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
                     val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
                     val snapView = snapHelper.findSnapView(layoutManager) ?: return
                     val snapPosition = layoutManager.getPosition(snapView)
-                    val lists = carouselAdapter.items
+                    val lists = carouselAdapter.dataset
 
                     val isAddButton = snapPosition >= lists.size
 
@@ -117,7 +116,7 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 cityListsViewModel.cityLists.collect { lists ->
-                    carouselAdapter.items = lists
+                    carouselAdapter.dataset = lists
                     carouselAdapter.notifyDataSetChanged()
                     if (selectedListIndex >= lists.size) selectedListIndex = lists.size - 1
                     if (selectedListIndex < 0) selectedListIndex = 0
@@ -140,7 +139,7 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
         val itemWidth = resources.getDimensionPixelSize(R.dimen.carousel_item_size)
         val layoutManager = binding.rvCarousel.layoutManager as? LinearLayoutManager
 
-        val lists = carouselAdapter.items
+        val lists = carouselAdapter.dataset
         if (selectedListIndex >= lists.size) {
             selectedListIndex = if (lists.isNotEmpty()) lists.size - 1 else 0
         }
@@ -239,7 +238,7 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
 
     inner class LimitedScrollLinearLayoutManager(context: android.content.Context) : LinearLayoutManager(context, HORIZONTAL, false) {
         override fun scrollHorizontallyBy(dx: Int, recycler: RecyclerView.Recycler?, state: RecyclerView.State?): Int {
-            val lists = carouselAdapter.items
+            val lists = carouselAdapter.dataset
             if (lists.isEmpty()) return super.scrollHorizontallyBy(dx, recycler, state)
 
             val lastVisiblePosition = findLastVisibleItemPosition()

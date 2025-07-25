@@ -1,11 +1,9 @@
 package com.example.citiestestapp.ui
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.citiestestapp.R
+import com.example.citiestestapp.databinding.ItemCityBinding
 import com.example.citiestestapp.model.City
 
 class CityAdapter(
@@ -14,8 +12,8 @@ class CityAdapter(
 ) : RecyclerView.Adapter<CityAdapter.CityViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CityViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_city, parent, false)
-        return CityViewHolder(view)
+        val binding = ItemCityBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return CityViewHolder(binding)
     }
 
     override fun getItemCount(): Int = dataset.size
@@ -46,10 +44,10 @@ class CityAdapter(
         }
     }
 
-    inner class CityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class CityViewHolder(private val binding: ItemCityBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(city: City) {
-            itemView.findViewById<TextView>(R.id.tvCityName).text = city.name
-            itemView.findViewById<TextView>(R.id.tvCityYear).text = city.year
+            binding.tvCityName.text = city.name
+            binding.tvCityYear.text = city.year
         }
     }
 }
