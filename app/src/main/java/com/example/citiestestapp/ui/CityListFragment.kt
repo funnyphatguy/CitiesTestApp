@@ -3,6 +3,7 @@ package com.example.citiestestapp.ui
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,17 +19,14 @@ class CityListFragment : Fragment(R.layout.fragment_city_list) {
         get() = _binding
             ?: throw IllegalStateException("Binding for FragmentCityListBinding must not be null")
 
-
-    private lateinit var viewModel: CityListViewModel
-
+    private lateinit var cityListViewModel: CityListViewModel
     private lateinit var adapter: CityAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentCityListBinding.bind(view)
 
-        viewModel =
-            androidx.lifecycle.ViewModelProvider(requireActivity())[CityListViewModel::class.java]
+        cityListViewModel = ViewModelProvider(requireActivity())[CityListViewModel::class.java]
 
         setupAdapter()
         setupObservers()
@@ -43,13 +41,9 @@ class CityListFragment : Fragment(R.layout.fragment_city_list) {
     }
 
     private fun setupObservers() {
-        viewModel.cityList.observe(viewLifecycleOwner) { cities ->
-            android.util.Log.d("CityListFragment", "Observer triggered with cities: $cities")
-            if (adapter.items != cities) {
-                adapter.updateItems(cities)
-            } else {
-                android.util.Log.d("CityListFragment", "Cities are the same, no adapter update")
-            }
+        cityListViewModel.cityList.observe(viewLifecycleOwner) { cities ->
+            android.util.Log.d("CityListFragment", "Обновление списка городов: $cities")
+            adapter.updateItems(cities)
         }
     }
 
@@ -66,7 +60,7 @@ class CityListFragment : Fragment(R.layout.fragment_city_list) {
                 val to = target.bindingAdapterPosition
 
                 adapter.swapItems(from, to)
-                viewModel.swapItems(from, to)
+                cityListViewModel.swapItems(from, to)
 
                 return true
             }

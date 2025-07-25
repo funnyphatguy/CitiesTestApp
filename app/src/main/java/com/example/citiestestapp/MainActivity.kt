@@ -3,11 +3,17 @@ package com.example.citiestestapp
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import com.example.citiestestapp.data.AppDatabase
+import com.example.citiestestapp.data.CityListRepository
 import com.example.citiestestapp.data.CityList
 import com.example.citiestestapp.databinding.ActivityMainBinding
 import com.example.citiestestapp.ui.CityListFragment
 import com.example.citiestestapp.ui.CityListViewModel
+import com.example.citiestestapp.ui.CityListsViewModel
 import com.example.citiestestapp.ui.CustomMenuFragment
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), CustomMenuFragment.OnCityListSelectedListener {
 
@@ -47,11 +53,20 @@ class MainActivity : AppCompatActivity(), CustomMenuFragment.OnCityListSelectedL
             }
         }
 
-        val cityListsViewModel =
-            ViewModelProvider(this).get(com.example.citiestestapp.ui.CityListsViewModel::class.java)
-        val defaultList = cityListsViewModel.getAllLists().firstOrNull()
-        if (defaultList != null) {
-            onCityListSelected(defaultList)
+        val appContext = applicationContext
+        val db = AppDatabase.getInstance(appContext)
+        val cityListsViewModel = ViewModelProvider(
+            this,
+            CityListsViewModel.provideFactory(CityListRepository(db.cityListDao()))
+        )[CityListsViewModel::class.java]
+
+        lifecycleScope.launch {
+            cityListsViewModel.cityLists.collectLatest { lists ->
+                val defaultList = lists.firstOrNull()
+                if (defaultList != null) {
+                    onCityListSelected(defaultList)
+                }
+            }
         }
     }
 
@@ -81,7 +96,7 @@ class MainActivity : AppCompatActivity(), CustomMenuFragment.OnCityListSelectedL
         binding.bottomNavigation.invalidate()
         android.util.Log.d("MainActivity", "Icon updated")
 
-        val viewModel = ViewModelProvider(this).get(CityListViewModel::class.java)
+        val viewModel = ViewModelProvider(this)[CityListViewModel::class.java]
         android.util.Log.d("MainActivity", "Setting city list: ${cityList.cities}")
         viewModel.setCityList(cityList.cities)
     }

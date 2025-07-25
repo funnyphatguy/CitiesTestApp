@@ -12,10 +12,17 @@ import com.example.citiestestapp.data.City
 import com.example.citiestestapp.data.CityList
 import com.example.citiestestapp.databinding.FragmentCustomMenuBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.Lifecycle
+import kotlinx.coroutines.launch
+import androidx.recyclerview.widget.LinearSnapHelper
+import com.example.citiestestapp.databinding.DialogAddCityListBinding
 
 class CustomMenuFragment : BottomSheetDialogFragment() {
+
     private var _binding: FragmentCustomMenuBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = requireNotNull(_binding) { "Binding must not be null" }
 
     private lateinit var carouselAdapter: CityListCarouselAdapter
     private lateinit var cityListsViewModel: CityListsViewModel
@@ -39,7 +46,8 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
             emptyList(),
             onAddClick = { showAddCityListDialog() },
             onItemClick = { cityList ->
-                val index = cityListsViewModel.getAllLists().indexOf(cityList)
+                val lists = carouselAdapter.items
+                val index = lists.indexOf(cityList)
                 if (index != -1) {
                     selectedListIndex = index
                     carouselAdapter.selectedIndex = selectedListIndex
@@ -51,8 +59,11 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
             }
         )
         binding.rvCarousel.adapter = carouselAdapter
-        binding.rvCarousel.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.rvCarousel.layoutManager = LimitedScrollLinearLayoutManager(requireContext())
+
+        val snapHelper = LinearSnapHelper()
+        snapHelper.attachToRecyclerView(binding.rvCarousel)
+
         carouselAdapter.selectedIndex = selectedListIndex
         carouselAdapter.notifyDataSetChanged()
         if (binding.rvCarousel.itemDecorationCount == 0) {
@@ -70,43 +81,53 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
         } else {
             binding.rvCarousel.post { centerSelectedItem() }
         }
+
         binding.rvCarousel.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
-                val centerX = recyclerView.width / 2
-                var minDistance = Int.MAX_VALUE
-                var centerPosition = -1
-                for (i in 0 until recyclerView.childCount) {
-                    val child = recyclerView.getChildAt(i)
-                    val childCenterX = (child.left + child.right) / 2
-                    val distance = kotlin.math.abs(childCenterX - centerX)
-                    if (distance < minDistance) {
-                        minDistance = distance
-                        centerPosition = recyclerView.getChildAdapterPosition(child)
+            private var isScrollCorrectionInProgress = false
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                if (newState == RecyclerView.SCROLL_STATE_IDLE && !isScrollCorrectionInProgress) {
+                    val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
+                    val snapView = snapHelper.findSnapView(layoutManager) ?: return
+                    val snapPosition = layoutManager.getPosition(snapView)
+                    val lists = carouselAdapter.items
+
+                    val isAddButton = snapPosition >= lists.size
+
+                    if (isAddButton) {
+                        isScrollCorrectionInProgress = true
+                        val targetPosition = selectedListIndex.coerceIn(0, lists.size - 1)
+                        recyclerView.smoothScrollToPosition(targetPosition)
+                        recyclerView.postDelayed({ isScrollCorrectionInProgress = false }, 500)
+                    } else if (snapPosition != selectedListIndex && snapPosition < lists.size) {
+
+                        selectedListIndex = snapPosition
+                        carouselAdapter.selectedIndex = selectedListIndex
+                        carouselAdapter.notifyDataSetChanged()
+                        val cityList = lists[selectedListIndex]
+                        binding.tvFullListName.text = cityList.fullName
+                        cityListSelectedListener?.onCityListSelected(cityList)
                     }
-                }
-                val lists = cityListsViewModel.getAllLists()
-                if (centerPosition != -1 && centerPosition != selectedListIndex && centerPosition < lists.size) {
-                    selectedListIndex = centerPosition
-                    carouselAdapter.selectedIndex = selectedListIndex
-                    carouselAdapter.notifyDataSetChanged()
-                    val cityList = lists[selectedListIndex]
-                    binding.tvFullListName.text = cityList.fullName
-                    cityListSelectedListener?.onCityListSelected(cityList)
                 }
             }
         })
-        cityListsViewModel.cityLists.observe(viewLifecycleOwner) { lists ->
-            carouselAdapter.items = lists
-            carouselAdapter.notifyDataSetChanged()
-            if (selectedListIndex >= lists.size) selectedListIndex = lists.size - 1
-            if (selectedListIndex < 0) selectedListIndex = 0
-            carouselAdapter.selectedIndex = selectedListIndex
-            binding.tvFullListName.text = lists.getOrNull(selectedListIndex)?.fullName ?: ""
-            binding.rvCarousel.post {
-                updateCenterItemDecoration()
-                centerSelectedItem()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                cityListsViewModel.cityLists.collect { lists ->
+                    carouselAdapter.items = lists
+                    carouselAdapter.notifyDataSetChanged()
+                    if (selectedListIndex >= lists.size) selectedListIndex = lists.size - 1
+                    if (selectedListIndex < 0) selectedListIndex = 0
+                    carouselAdapter.selectedIndex = selectedListIndex
+                    binding.tvFullListName.text = lists.getOrNull(selectedListIndex)?.fullName ?: ""
+                    binding.rvCarousel.post {
+                        updateCenterItemDecoration()
+                        centerSelectedItem()
+                    }
+                }
             }
         }
         binding.icArrowDown.setOnClickListener {
@@ -118,6 +139,12 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
         val recyclerViewWidth = binding.rvCarousel.width
         val itemWidth = resources.getDimensionPixelSize(R.dimen.carousel_item_size)
         val layoutManager = binding.rvCarousel.layoutManager as? LinearLayoutManager
+
+        val lists = carouselAdapter.items
+        if (selectedListIndex >= lists.size) {
+            selectedListIndex = if (lists.isNotEmpty()) lists.size - 1 else 0
+        }
+
         layoutManager?.scrollToPositionWithOffset(selectedListIndex, (recyclerViewWidth - itemWidth) / 2)
     }
 
@@ -154,17 +181,7 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
 
     private fun showAddCityListDialog() {
         val allCities = getAllCities()
-        AddCityListDialogFragment(allCities) { newList ->
-            cityListsViewModel.addList(newList)
-            carouselAdapter.notifyDataSetChanged()
-            binding.rvCarousel.post {
-                updateCenterItemDecoration()
-                selectedListIndex = cityListsViewModel.getAllLists().size - 1
-                carouselAdapter.selectedIndex = selectedListIndex
-                carouselAdapter.notifyDataSetChanged()
-                centerSelectedItem()
-            }
-        }.show(parentFragmentManager, "AddCityListDialog")
+        AddCityListDialogFragment(allCities).show(parentFragmentManager, "AddCityListDialog")
     }
 
     private fun getAllCities(): List<City> {
@@ -217,6 +234,22 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
                 behavior.state =
                     com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
             }
+        }
+    }
+
+    inner class LimitedScrollLinearLayoutManager(context: android.content.Context) : LinearLayoutManager(context, HORIZONTAL, false) {
+        override fun scrollHorizontallyBy(dx: Int, recycler: RecyclerView.Recycler?, state: RecyclerView.State?): Int {
+            val lists = carouselAdapter.items
+            if (lists.isEmpty()) return super.scrollHorizontallyBy(dx, recycler, state)
+
+            val lastVisiblePosition = findLastVisibleItemPosition()
+
+            if (dx > 0 && lastVisiblePosition >= lists.size) {
+                val limitedDx = (dx * 0.3f).toInt() // Ограничиваем скролл на 70%
+                return super.scrollHorizontallyBy(limitedDx, recycler, state)
+            }
+
+            return super.scrollHorizontallyBy(dx, recycler, state)
         }
     }
 }
