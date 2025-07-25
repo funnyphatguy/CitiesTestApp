@@ -3,12 +3,12 @@ package com.example.citiestestapp.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.citiestestapp.data.City
-import com.example.citiestestapp.data.CityListEntity
+import com.example.citiestestapp.model.City
+import com.example.citiestestapp.model.CityListEntity
 import com.example.citiestestapp.data.CityListRepository
-import com.example.citiestestapp.data.toDomain
-import com.example.citiestestapp.data.toEntity
-import com.example.citiestestapp.data.CityList
+import com.example.citiestestapp.model.toDomain
+import com.example.citiestestapp.model.toEntity
+import com.example.citiestestapp.model.CityList
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map

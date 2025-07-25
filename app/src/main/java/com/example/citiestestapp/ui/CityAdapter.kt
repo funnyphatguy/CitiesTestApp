@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.citiestestapp.R
-import com.example.citiestestapp.data.City
+import com.example.citiestestapp.model.City
 
 class CityAdapter(
-    val items: MutableList<City>
+    val dataset: MutableList<City>
 
 ) : RecyclerView.Adapter<CityAdapter.CityViewHolder>() {
 
@@ -18,17 +18,17 @@ class CityAdapter(
         return CityViewHolder(view)
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = dataset.size
 
     override fun onBindViewHolder(holder: CityViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(dataset[position])
     }
 
     fun swapItems(from: Int, to: Int) {
-        if (from in items.indices && to in items.indices) {
-            val temp = items[from]
-            items[from] = items[to]
-            items[to] = temp
+        if (from in dataset.indices && to in dataset.indices) {
+            val temp = dataset[from]
+            dataset[from] = dataset[to]
+            dataset[to] = temp
 
             notifyItemMoved(from, to)
         }
@@ -36,9 +36,9 @@ class CityAdapter(
 
     fun updateItems(newItems: List<City>) {
         android.util.Log.d("CityAdapter", "updateItems called with: $newItems")
-        if (items.size != newItems.size || !items.containsAll(newItems)) {
-            items.clear()
-            items.addAll(newItems)
+        if (dataset.size != newItems.size || !dataset.containsAll(newItems)) {
+            dataset.clear()
+            dataset.addAll(newItems)
             android.util.Log.d("CityAdapter", "Items updated, calling notifyDataSetChanged")
             notifyDataSetChanged()
         } else {

@@ -1,9 +1,7 @@
-package com.example.citiestestapp.data
+package com.example.citiestestapp.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.citiestestapp.data.City
-import com.example.citiestestapp.data.CityList
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -37,4 +35,4 @@ fun CityList.toEntity(): CityListEntity {
         color = color,
         cities = gson.toJson(cities)
     )
-}
+} 

@@ -1,4 +1,4 @@
-package com.example.citiestestapp.data
+package com.example.citiestestapp.model
 
 import android.os.Parcelable
 import androidx.annotation.ColorRes
@@ -19,4 +19,4 @@ data class CityList(
     val fullName: String,
     @field:ColorRes val color: Int,
     val cities: List<City>
-): Parcelable
+): Parcelable 
