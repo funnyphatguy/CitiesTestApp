@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.citiestestapp.R
-import com.example.citiestestapp.data.City
-import com.example.citiestestapp.data.CityList
+import com.example.citiestestapp.model.City
+import com.example.citiestestapp.model.CityList
 import com.example.citiestestapp.databinding.FragmentCustomMenuBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import androidx.lifecycle.lifecycleScope

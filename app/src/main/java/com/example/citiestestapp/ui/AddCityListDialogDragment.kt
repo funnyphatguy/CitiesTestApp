@@ -13,11 +13,10 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.example.citiestestapp.R
 import com.example.citiestestapp.data.AppDatabase
-import com.example.citiestestapp.data.City
-import com.example.citiestestapp.data.CityList
 import com.example.citiestestapp.data.CityListRepository
 import com.example.citiestestapp.databinding.DialogAddCityListBinding
-import com.example.citiestestapp.ui.CityListsViewModel
+import com.example.citiestestapp.model.City
+import com.example.citiestestapp.model.CityList
 
 class AddCityListDialogFragment(
     private val allCities: List<City>

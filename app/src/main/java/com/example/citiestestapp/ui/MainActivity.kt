@@ -1,17 +1,14 @@
-package com.example.citiestestapp
+package com.example.citiestestapp.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.example.citiestestapp.R
 import com.example.citiestestapp.data.AppDatabase
 import com.example.citiestestapp.data.CityListRepository
-import com.example.citiestestapp.data.CityList
 import com.example.citiestestapp.databinding.ActivityMainBinding
-import com.example.citiestestapp.ui.CityListFragment
-import com.example.citiestestapp.ui.CityListViewModel
-import com.example.citiestestapp.ui.CityListsViewModel
-import com.example.citiestestapp.ui.CustomMenuFragment
+import com.example.citiestestapp.model.CityList
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -100,5 +97,4 @@ class MainActivity : AppCompatActivity(), CustomMenuFragment.OnCityListSelectedL
         android.util.Log.d("MainActivity", "Setting city list: ${cityList.cities}")
         viewModel.setCityList(cityList.cities)
     }
-}
-
+} 

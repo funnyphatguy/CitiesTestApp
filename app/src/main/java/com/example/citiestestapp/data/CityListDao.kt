@@ -2,6 +2,7 @@ package com.example.citiestestapp.data
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import com.example.citiestestapp.model.CityListEntity
 
 @Dao
 interface CityListDao {

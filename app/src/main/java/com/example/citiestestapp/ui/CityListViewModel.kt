@@ -2,7 +2,7 @@ package com.example.citiestestapp.ui
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.example.citiestestapp.data.City
+import com.example.citiestestapp.model.City
 
 class CityListViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
 
