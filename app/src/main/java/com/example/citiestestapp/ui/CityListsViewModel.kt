@@ -1,31 +1,50 @@
 package com.example.citiestestapp.ui
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.citiestestapp.R
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.citiestestapp.data.City
+import com.example.citiestestapp.data.CityListEntity
+import com.example.citiestestapp.data.CityListRepository
+import com.example.citiestestapp.data.toDomain
+import com.example.citiestestapp.data.toEntity
 import com.example.citiestestapp.data.CityList
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.cancel
 
-class CityListsViewModel : ViewModel() {
-    private val _cityLists = MutableLiveData(mutableListOf(getDefaultEuropeList()))
-    val cityLists: LiveData<MutableList<CityList>> = _cityLists
+class CityListsViewModel(private val repository: CityListRepository) : ViewModel() {
+    val cityLists: StateFlow<List<CityList>> =
+        repository.getAllLists()
+            .map { list -> list.map { it.toDomain() } }
+            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    fun addList(list: CityList) {
-        val current = _cityLists.value ?: mutableListOf()
-        current.add(list)
-        _cityLists.value = current
+    init {
+        viewModelScope.launch {
+            repository.getAllLists().collect { lists ->
+                if (lists.isEmpty()) {
+                    repository.insertList(getDefaultEuropeList().toEntity())
+                }
+                cancel()
+            }
+        }
     }
 
-    fun getList(index: Int): CityList? = _cityLists.value?.getOrNull(index)
+    fun addList(list: CityList) {
+        viewModelScope.launch {
+            repository.insertList(list.toEntity())
+        }
+    }
 
-    fun getAllLists(): List<CityList> = _cityLists.value ?: emptyList()
 
-    companion object {
-        fun getDefaultEuropeList() = CityList(
+    private fun getDefaultEuropeList(): CityList {
+        return CityList(
             shortName = "Европа",
             fullName = "Города Европы",
-            color = R.color.color_blue,
+            color = com.example.citiestestapp.R.color.color_blue,
             cities = listOf(
                 City("Париж", "III век до н.э."),
                 City("Вена", "1147 год"),
@@ -34,5 +53,15 @@ class CityListsViewModel : ViewModel() {
                 City("Милан", "1899 год")
             )
         )
+    }
+
+    companion object {
+        fun provideFactory(repository: CityListRepository): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    @Suppress("UNCHECKED_CAST")
+                    return CityListsViewModel(repository) as T
+                }
+            }
     }
 }

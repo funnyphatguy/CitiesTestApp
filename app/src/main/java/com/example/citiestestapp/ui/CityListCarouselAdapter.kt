@@ -42,6 +42,7 @@ class CityListCarouselAdapter(
             holder.bind(items[position], isSelected)
             holder.itemView.setOnClickListener { onItemClick(items[position]) }
         } else if (holder is AddViewHolder) {
+            holder.bind()
             holder.itemView.setOnClickListener { onAddClick() }
         }
     }
@@ -60,5 +61,28 @@ class CityListCarouselAdapter(
         }
     }
 
-    inner class AddViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+    inner class AddViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        fun bind() {
+            val imageView = itemView.findViewById<android.widget.ImageView>(android.R.id.icon)
+            if (imageView != null) {
+                val bg = imageView.background as? GradientDrawable
+                val yellowColor = ContextCompat.getColor(itemView.context, R.color.color_yellow)
+                bg?.setColor(yellowColor)
+            } else {
+                // Если ImageView не найден по стандартному ID, ищем по layout
+                val container = itemView as? android.widget.FrameLayout
+                container?.let { frameLayout ->
+                    for (i in 0 until frameLayout.childCount) {
+                        val child = frameLayout.getChildAt(i)
+                        if (child is android.widget.ImageView) {
+                            val bg = child.background as? GradientDrawable
+                            val yellowColor = ContextCompat.getColor(itemView.context, R.color.color_yellow)
+                            bg?.setColor(yellowColor)
+                            break
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
