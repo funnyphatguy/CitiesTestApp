@@ -35,7 +35,9 @@ class AddCityListDialogFragment(
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        _binding = DialogAddCityListBinding.inflate(LayoutInflater.from(requireContext()))
+        _binding = DialogAddCityListBinding.inflate(
+            LayoutInflater.from(requireContext())
+        )
         val view = binding.root
 
         selectedColor = R.color.color_blue

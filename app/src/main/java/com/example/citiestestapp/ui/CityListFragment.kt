@@ -17,7 +17,9 @@ class CityListFragment : Fragment(R.layout.fragment_city_list) {
     private var _binding: FragmentCityListBinding? = null
     private val binding
         get() = _binding
-            ?: throw IllegalStateException("Binding for FragmentCityListBinding must not be null")
+            ?: throw IllegalStateException(
+                "Binding for FragmentCityListBinding must not be null"
+            )
 
     private lateinit var cityListViewModel: CityListViewModel
     private lateinit var adapter: CityAdapter
@@ -26,7 +28,9 @@ class CityListFragment : Fragment(R.layout.fragment_city_list) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentCityListBinding.bind(view)
 
-        cityListViewModel = ViewModelProvider(requireActivity())[CityListViewModel::class.java]
+        cityListViewModel = ViewModelProvider(
+            requireActivity()
+        )[CityListViewModel::class.java]
 
         setupAdapter()
         setupObservers()
@@ -42,13 +46,17 @@ class CityListFragment : Fragment(R.layout.fragment_city_list) {
 
     private fun setupObservers() {
         cityListViewModel.cityList.observe(viewLifecycleOwner) { cities ->
-            android.util.Log.d("CityListFragment", "Обновление списка городов: $cities")
+            android.util.Log.d(
+                "CityListFragment",
+                "Обновление списка городов: $cities"
+            )
             adapter.updateItems(cities)
         }
     }
 
     private fun setupDragAndDrop() {
-        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+        val itemTouchHelper = ItemTouchHelper(
+            object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
         ) {
             override fun onMove(

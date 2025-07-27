@@ -14,7 +14,9 @@ class CityListViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
         private const val CITIES_KEY = "cities"
     }
 
-    private val _cityList = savedStateHandle.getLiveData<List<City>>(CITIES_KEY, getDefaultCities())
+    private val _cityList = savedStateHandle.getLiveData<List<City>>(
+        CITIES_KEY, getDefaultCities()
+    )
     val cityList = _cityList
 
     private fun getDefaultCities() = mutableListOf<City>(
@@ -38,8 +40,12 @@ class CityListViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
     }
 
     fun setCityList(newList: List<City>) {
-        android.util.Log.d("CityListViewModel", "setCityList called with: $newList")
+        android.util.Log.d(
+            "CityListViewModel", "setCityList called with: $newList"
+        )
         savedStateHandle[CITIES_KEY] = newList
-        android.util.Log.d("CityListViewModel", "Updated cityList value: ${_cityList.value}")
+        android.util.Log.d(
+            "CityListViewModel", "Updated cityList value: ${_cityList.value}"
+        )
     }
 }

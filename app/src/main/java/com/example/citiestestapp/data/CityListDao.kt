@@ -9,6 +9,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CityListDao {
+
+    //весь crud тут прописывать не стал, как будто нет смысла
+    //тут подошла бы и лайв дата, но решил оставить Flow, т.к. у вас в требованиях к вакансии он указан)
     @Query("SELECT * FROM city_lists")
     fun getAll(): Flow<List<CityListEntity>>
 

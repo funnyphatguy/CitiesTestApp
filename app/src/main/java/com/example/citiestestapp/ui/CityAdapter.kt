@@ -11,8 +11,14 @@ class CityAdapter(
 
 ) : RecyclerView.Adapter<CityAdapter.CityViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CityViewHolder {
-        val binding = ItemCityBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    override fun onCreateViewHolder(
+        parent: ViewGroup, viewType: Int
+    ): CityViewHolder {
+        val binding = ItemCityBinding.inflate(
+            LayoutInflater.from(
+                parent.context
+            ), parent, false
+        )
         return CityViewHolder(binding)
     }
 
@@ -37,14 +43,20 @@ class CityAdapter(
         if (dataset.size != newItems.size || !dataset.containsAll(newItems)) {
             dataset.clear()
             dataset.addAll(newItems)
-            android.util.Log.d("CityAdapter", "Items updated, calling notifyDataSetChanged")
+            android.util.Log.d(
+                "CityAdapter", "Items updated, calling notifyDataSetChanged"
+            )
             notifyDataSetChanged()
         } else {
-            android.util.Log.d("CityAdapter", "Items are the same, no update needed")
+            android.util.Log.d(
+                "CityAdapter", "Items are the same, no update needed"
+            )
         }
     }
 
-    inner class CityViewHolder(private val binding: ItemCityBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class CityViewHolder(
+        private val binding: ItemCityBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(city: City) {
             binding.tvCityName.text = city.name
             binding.tvCityYear.text = city.year
