@@ -3,18 +3,17 @@ package com.example.citiestestapp.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.citiestestapp.model.City
-import com.example.citiestestapp.model.CityListEntity
 import com.example.citiestestapp.data.CityListRepository
+import com.example.citiestestapp.model.City
+import com.example.citiestestapp.model.CityList
 import com.example.citiestestapp.model.toDomain
 import com.example.citiestestapp.model.toEntity
-import com.example.citiestestapp.model.CityList
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.cancel
 
 class CityListsViewModel(private val repository: CityListRepository) : ViewModel() {
     val cityLists: StateFlow<List<CityList>> =

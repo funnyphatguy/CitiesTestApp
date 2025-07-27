@@ -26,7 +26,9 @@ class MainActivity : AppCompatActivity(), CustomMenuFragment.OnCityListSelectedL
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(binding.fragmentContainer.id, CityListFragment())
+                .replace(
+                    binding.fragmentContainer.id, CityListFragment()
+                )
                 .commit()
         }
 
@@ -35,7 +37,9 @@ class MainActivity : AppCompatActivity(), CustomMenuFragment.OnCityListSelectedL
             when (item.itemId) {
                 R.id.nav_city_list -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(binding.fragmentContainer.id, CityListFragment())
+                        .replace(
+                            binding.fragmentContainer.id, CityListFragment()
+                        )
                         .commit()
                     true
                 }
@@ -54,7 +58,9 @@ class MainActivity : AppCompatActivity(), CustomMenuFragment.OnCityListSelectedL
         val db = AppDatabase.getInstance(appContext)
         val cityListsViewModel = ViewModelProvider(
             this,
-            CityListsViewModel.provideFactory(CityListRepository(db.cityListDao()))
+            CityListsViewModel.provideFactory(
+                CityListRepository(db.cityListDao())
+            )
         )[CityListsViewModel::class.java]
 
         lifecycleScope.launch {
@@ -81,10 +87,16 @@ class MainActivity : AppCompatActivity(), CustomMenuFragment.OnCityListSelectedL
         val menu = binding.bottomNavigation.menu
         val item = menu.findItem(R.id.nav_custom_tab)
         item.title = cityList.shortName
-        val colorInt = androidx.core.content.ContextCompat.getColor(this, cityList.color)
-        android.util.Log.d("MainActivity", "Color resolved to: $colorInt")
+        val colorInt = androidx.core.content.ContextCompat.getColor(
+            this, cityList.color
+        )
+        android.util.Log.d(
+            "MainActivity", "Color resolved to: $colorInt"
+        )
         val iconDrawable =
-            android.graphics.drawable.ShapeDrawable(android.graphics.drawable.shapes.OvalShape())
+            android.graphics.drawable.ShapeDrawable(
+                android.graphics.drawable.shapes.OvalShape()
+            )
         iconDrawable.paint.color = colorInt
         val sizePx = resources.getDimensionPixelSize(R.dimen._40dp)
         iconDrawable.intrinsicWidth = sizePx

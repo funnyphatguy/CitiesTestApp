@@ -26,8 +26,8 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
     private lateinit var carouselAdapter: CityListCarouselAdapter
     private lateinit var cityListsViewModel: CityListsViewModel
     private var selectedListIndex: Int = 0
-    private var bottomSheetBehavior: com.google.android.material.bottomsheet.BottomSheetBehavior<View>? =
-        null
+    private var bottomSheetBehavior:
+            com.google.android.material.bottomsheet.BottomSheetBehavior<View>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,7 +39,11 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        cityListsViewModel = ViewModelProvider(requireActivity()).get(CityListsViewModel::class.java)
+        cityListsViewModel = ViewModelProvider(
+            requireActivity()
+        ).get(
+            CityListsViewModel::class.java
+        )
         selectedListIndex = 0
         carouselAdapter = CityListCarouselAdapter(
             emptyList(),
@@ -58,7 +62,9 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
             }
         )
         binding.rvCarousel.adapter = carouselAdapter
-        binding.rvCarousel.layoutManager = LimitedScrollLinearLayoutManager(requireContext())
+        binding.rvCarousel.layoutManager = LimitedScrollLinearLayoutManager(
+            requireContext()
+        )
 
         val snapHelper = LinearSnapHelper()
         snapHelper.attachToRecyclerView(binding.rvCarousel)
@@ -99,7 +105,9 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
                         isScrollCorrectionInProgress = true
                         val targetPosition = selectedListIndex.coerceIn(0, lists.size - 1)
                         recyclerView.smoothScrollToPosition(targetPosition)
-                        recyclerView.postDelayed({ isScrollCorrectionInProgress = false }, 500)
+                        recyclerView.postDelayed(
+                            { isScrollCorrectionInProgress = false }, 500
+                        )
                     } else if (snapPosition != selectedListIndex && snapPosition < lists.size) {
 
                         selectedListIndex = snapPosition
@@ -144,18 +152,23 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
             selectedListIndex = if (lists.isNotEmpty()) lists.size - 1 else 0
         }
 
-        layoutManager?.scrollToPositionWithOffset(selectedListIndex, (recyclerViewWidth - itemWidth) / 2)
+        layoutManager?.scrollToPositionWithOffset(
+            selectedListIndex, (recyclerViewWidth - itemWidth) / 2
+        )
     }
 
     override fun onStart() {
         super.onStart()
         val dialog = dialog as? com.google.android.material.bottomsheet.BottomSheetDialog ?: return
-        val bottomSheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) ?: return
+        val bottomSheet = dialog.findViewById<View>(
+            com.google.android.material.R.id.design_bottom_sheet
+        ) ?: return
         bottomSheetBehavior =
             com.google.android.material.bottomsheet.BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior?.state =
             com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HALF_EXPANDED
-        bottomSheetBehavior?.addBottomSheetCallback(object :
+        bottomSheetBehavior?.addBottomSheetCallback(
+            object :
             com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
             }
@@ -175,7 +188,9 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
         }
         val recyclerViewWidth = binding.rvCarousel.width
         val itemWidth = resources.getDimensionPixelSize(R.dimen.carousel_item_size)
-        binding.rvCarousel.addItemDecoration(CenterItemDecoration(itemWidth, recyclerViewWidth))
+        binding.rvCarousel.addItemDecoration(
+            CenterItemDecoration(itemWidth, recyclerViewWidth)
+        )
     }
 
     private fun showAddCityListDialog() {
@@ -236,15 +251,18 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
         }
     }
 
-    inner class LimitedScrollLinearLayoutManager(context: android.content.Context) : LinearLayoutManager(context, HORIZONTAL, false) {
-        override fun scrollHorizontallyBy(dx: Int, recycler: RecyclerView.Recycler?, state: RecyclerView.State?): Int {
+    inner class LimitedScrollLinearLayoutManager(context: android.content.Context) :
+        LinearLayoutManager(context, HORIZONTAL, false) {
+        override fun scrollHorizontallyBy(
+            dx: Int, recycler: RecyclerView.Recycler?, state: RecyclerView.State?
+        ): Int {
             val lists = carouselAdapter.dataset
             if (lists.isEmpty()) return super.scrollHorizontallyBy(dx, recycler, state)
 
             val lastVisiblePosition = findLastVisibleItemPosition()
 
             if (dx > 0 && lastVisiblePosition >= lists.size) {
-                val limitedDx = (dx * 0.3f).toInt() // Ограничиваем скролл на 70%
+                val limitedDx = (dx * 0.3f).toInt()
                 return super.scrollHorizontallyBy(limitedDx, recycler, state)
             }
 

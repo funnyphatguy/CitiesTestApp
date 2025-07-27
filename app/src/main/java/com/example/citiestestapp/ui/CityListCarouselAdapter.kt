@@ -36,7 +36,9 @@ class CityListCarouselAdapter(
             CityListViewHolder(binding)
         } else {
             val binding =
-                ItemCityListAddBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                ItemCityListAddBinding.inflate(
+                    LayoutInflater.from(parent.context), parent, false
+                )
             AddViewHolder(binding)
         }
     }

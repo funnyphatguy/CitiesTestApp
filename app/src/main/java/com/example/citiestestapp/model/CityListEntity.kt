@@ -14,6 +14,7 @@ data class CityListEntity(
     val cities: String
 )
 
+// честно говоря для этого приложения это несколько излишне, но пусть будет, clean archtecture, все такое
 fun CityListEntity.toDomain(): CityList {
     val gson = Gson()
     val cityType = object : TypeToken<List<City>>() {}.type
