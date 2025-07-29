@@ -1,5 +1,6 @@
-package com.example.citiestestapp.ui
+package com.example.citiestestapp.ui.selector
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,19 +16,23 @@ import com.example.citiestestapp.R
 import com.example.citiestestapp.databinding.FragmentCustomMenuBinding
 import com.example.citiestestapp.model.City
 import com.example.citiestestapp.model.CityList
+import com.example.citiestestapp.ui.newList.AddCityListDialogFragment
+import com.example.citiestestapp.ui.newList.CityListsViewModel
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
 
-class CustomMenuFragment : BottomSheetDialogFragment() {
+class ListSelectorFragment : BottomSheetDialogFragment() {
 
     private var _binding: FragmentCustomMenuBinding? = null
     private val binding get() = requireNotNull(_binding) { "Binding must not be null" }
 
-    private lateinit var carouselAdapter: CityListCarouselAdapter
+    private lateinit var carouselAdapter: ListSelectorAdapter
     private lateinit var cityListsViewModel: CityListsViewModel
     private var selectedListIndex: Int = 0
     private var bottomSheetBehavior:
-            com.google.android.material.bottomsheet.BottomSheetBehavior<View>? = null
+            BottomSheetBehavior<View>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,7 +50,7 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
             CityListsViewModel::class.java
         )
         selectedListIndex = 0
-        carouselAdapter = CityListCarouselAdapter(
+        carouselAdapter = ListSelectorAdapter(
             emptyList(),
             onAddClick = { showAddCityListDialog() },
             onItemClick = { cityList ->
@@ -159,17 +164,17 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
 
     override fun onStart() {
         super.onStart()
-        val dialog = dialog as? com.google.android.material.bottomsheet.BottomSheetDialog ?: return
+        val dialog = dialog as? BottomSheetDialog ?: return
         val bottomSheet = dialog.findViewById<View>(
             com.google.android.material.R.id.design_bottom_sheet
         ) ?: return
         bottomSheetBehavior =
-            com.google.android.material.bottomsheet.BottomSheetBehavior.from(bottomSheet)
+            BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior?.state =
-            com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HALF_EXPANDED
+            BottomSheetBehavior.STATE_HALF_EXPANDED
         bottomSheetBehavior?.addBottomSheetCallback(
             object :
-            com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback() {
+            BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
             }
 
@@ -219,7 +224,7 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
 
     private var cityListSelectedListener: OnCityListSelectedListener? = null
 
-    override fun onAttach(context: android.content.Context) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is OnCityListSelectedListener) {
             cityListSelectedListener = context
@@ -239,19 +244,19 @@ class CustomMenuFragment : BottomSheetDialogFragment() {
     private fun toggleBottomSheetState() {
         val behavior = bottomSheetBehavior ?: return
         when (behavior.state) {
-            com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED -> {
+            BottomSheetBehavior.STATE_EXPANDED -> {
                 behavior.state =
-                    com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HALF_EXPANDED
+                    BottomSheetBehavior.STATE_HALF_EXPANDED
             }
 
             else -> {
                 behavior.state =
-                    com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+                    BottomSheetBehavior.STATE_EXPANDED
             }
         }
     }
 
-    inner class LimitedScrollLinearLayoutManager(context: android.content.Context) :
+    inner class LimitedScrollLinearLayoutManager(context: Context) :
         LinearLayoutManager(context, HORIZONTAL, false) {
         override fun scrollHorizontallyBy(
             dx: Int, recycler: RecyclerView.Recycler?, state: RecyclerView.State?

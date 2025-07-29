@@ -1,4 +1,4 @@
-package com.example.citiestestapp.ui
+package com.example.citiestestapp.ui.newList
 
 import android.app.Dialog
 import android.os.Bundle
@@ -12,7 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.example.citiestestapp.R
-import com.example.citiestestapp.data.AppDatabase
+import com.example.citiestestapp.app.CitiesApplication
 import com.example.citiestestapp.data.CityListRepository
 import com.example.citiestestapp.databinding.DialogAddCityListBinding
 import com.example.citiestestapp.model.City
@@ -29,9 +29,10 @@ class AddCityListDialogFragment(
     private var selectedColor: Int = 0
 
     private val viewModel: CityListsViewModel by activityViewModels {
-        val appContext = requireContext().applicationContext
-        val db = AppDatabase.getInstance(appContext)
-        CityListsViewModel.provideFactory(CityListRepository(db.cityListDao()))
+        val app = requireActivity().application as CitiesApplication
+        CityListsViewModel.provideFactory(
+            CityListRepository(app.database.cityListDao())
+        )
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -64,13 +65,12 @@ class AddCityListDialogFragment(
             ) {
                 selectedColor = colors[position].second
             }
-
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
         allCities.forEach { city ->
             val checkBox = CheckBox(requireContext()).apply {
-                "${city.name} (${city.year})".also { text = it }
+                text = "${city.name} (${city.year})"
                 setOnCheckedChangeListener { buttonView, isChecked ->
                     if (isChecked) {
                         if (selectedCities.size < 5) {
@@ -79,7 +79,7 @@ class AddCityListDialogFragment(
                             buttonView.isChecked = false
                             Toast.makeText(
                                 requireContext(),
-                                context.getString(R.string.max_cities_message),
+                                getString(R.string.max_cities_message),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -91,10 +91,7 @@ class AddCityListDialogFragment(
             binding.layoutCities.addView(checkBox)
         }
 
-        binding.btnCancel.setOnClickListener {
-            dismiss()
-        }
-
+        binding.btnCancel.setOnClickListener { dismiss() }
         binding.btnConfirm.setOnClickListener {
             val shortName = binding.etShortName.text.toString().trim()
             val fullName = binding.etFullName.text.toString().trim()

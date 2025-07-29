@@ -1,15 +1,16 @@
-package com.example.citiestestapp.ui
+package com.example.citiestestapp.ui.cities
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.citiestestapp.databinding.ItemCityBinding
 import com.example.citiestestapp.model.City
 
-class CityAdapter(
+class CitiesAdapter(
     val dataset: MutableList<City>
 
-) : RecyclerView.Adapter<CityAdapter.CityViewHolder>() {
+) : RecyclerView.Adapter<CitiesAdapter.CityViewHolder>() {
 
     override fun onCreateViewHolder(
         parent: ViewGroup, viewType: Int
@@ -39,16 +40,16 @@ class CityAdapter(
     }
 
     fun updateItems(newItems: List<City>) {
-        android.util.Log.d("CityAdapter", "updateItems called with: $newItems")
+        Log.d("CityAdapter", "updateItems called with: $newItems")
         if (dataset.size != newItems.size || !dataset.containsAll(newItems)) {
             dataset.clear()
             dataset.addAll(newItems)
-            android.util.Log.d(
+            Log.d(
                 "CityAdapter", "Items updated, calling notifyDataSetChanged"
             )
             notifyDataSetChanged()
         } else {
-            android.util.Log.d(
+            Log.d(
                 "CityAdapter", "Items are the same, no update needed"
             )
         }

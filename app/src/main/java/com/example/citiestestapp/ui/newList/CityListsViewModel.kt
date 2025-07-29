@@ -1,8 +1,9 @@
-package com.example.citiestestapp.ui
+package com.example.citiestestapp.ui.newList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.citiestestapp.R
 import com.example.citiestestapp.data.CityListRepository
 import com.example.citiestestapp.model.City
 import com.example.citiestestapp.model.CityList
@@ -19,7 +20,7 @@ class CityListsViewModel(private val repository: CityListRepository) : ViewModel
     val cityLists: StateFlow<List<CityList>> =
         repository.getAllLists()
             .map { list -> list.map { it.toDomain() } }
-            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+            .stateIn(viewModelScope, SharingStarted.Companion.Lazily, emptyList())
 
     init {
         viewModelScope.launch {
@@ -38,12 +39,11 @@ class CityListsViewModel(private val repository: CityListRepository) : ViewModel
         }
     }
 
-
     private fun getDefaultEuropeList(): CityList {
         return CityList(
             shortName = "Европа",
             fullName = "Города Европы",
-            color = com.example.citiestestapp.R.color.color_blue,
+            color = R.color.color_blue,
             cities = listOf(
                 City("Париж", "III век до н.э."),
                 City("Вена", "1147 год"),

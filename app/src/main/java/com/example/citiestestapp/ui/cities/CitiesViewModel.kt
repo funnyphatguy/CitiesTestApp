@@ -1,17 +1,14 @@
-package com.example.citiestestapp.ui
+package com.example.citiestestapp.ui.cities
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.citiestestapp.model.City
 
-class CityListViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
+class CitiesViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
 
     init {
         println("ViewModel created! Saved state: ${savedStateHandle.get<List<City>>(CITIES_KEY)}")
-    }
-
-    companion object {
-        private const val CITIES_KEY = "cities"
     }
 
     private val _cityList = savedStateHandle.getLiveData<List<City>>(
@@ -19,7 +16,7 @@ class CityListViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
     )
     val cityList = _cityList
 
-    private fun getDefaultCities() = mutableListOf<City>(
+    private fun getDefaultCities() = mutableListOf(
         City("Париж", "III век до н.э."),
         City("Вена", "1147 год"),
         City("Берлин", "1237 год"),
@@ -40,12 +37,16 @@ class CityListViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
     }
 
     fun setCityList(newList: List<City>) {
-        android.util.Log.d(
+        Log.d(
             "CityListViewModel", "setCityList called with: $newList"
         )
         savedStateHandle[CITIES_KEY] = newList
-        android.util.Log.d(
+        Log.d(
             "CityListViewModel", "Updated cityList value: ${_cityList.value}"
         )
+    }
+
+    companion object {
+        private const val CITIES_KEY = "cities"
     }
 }

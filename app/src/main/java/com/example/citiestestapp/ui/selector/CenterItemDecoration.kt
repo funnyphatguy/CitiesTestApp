@@ -1,4 +1,4 @@
-package com.example.citiestestapp.ui
+package com.example.citiestestapp.ui.selector
 
 import android.graphics.Rect
 import android.view.View
