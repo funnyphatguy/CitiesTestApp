@@ -1,7 +1,6 @@
 package com.example.citiestestapp.ui.cities
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -16,22 +15,17 @@ import com.google.android.material.divider.MaterialDividerItemDecoration
 class CitiesListFragment : Fragment(R.layout.fragment_city_list) {
 
     private var _binding: FragmentCityListBinding? = null
-    private val binding
-        get() = _binding
-            ?: throw IllegalStateException(
-                "Binding for FragmentCityListBinding must not be null"
-            )
+    private val binding: FragmentCityListBinding
+        get() = requireNotNull(_binding) { "Binding for FragmentCityListBinding must not be null" }
 
-    private lateinit var citiesViewModel: CitiesViewModel
+    private lateinit var viewModel: CitiesViewModel
     private lateinit var adapter: CitiesAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentCityListBinding.bind(view)
 
-        citiesViewModel = ViewModelProvider(
-            requireActivity()
-        )[CitiesViewModel::class.java]
+        viewModel = ViewModelProvider(requireActivity())[CitiesViewModel::class.java]
 
         setupAdapter()
         setupObservers()
@@ -41,52 +35,51 @@ class CitiesListFragment : Fragment(R.layout.fragment_city_list) {
 
     private fun setupAdapter() {
         adapter = CitiesAdapter(mutableListOf())
-        binding.rvCities.adapter = adapter
-        binding.rvCities.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvCities.apply {
+            adapter = this@CitiesListFragment.adapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
     }
 
     private fun setupObservers() {
-        citiesViewModel.cityList.observe(viewLifecycleOwner) { cities ->
-            Log.d(
-                "CityListFragment",
-                "Обновление списка городов: $cities"
-            )
+        viewModel.cityList.observe(viewLifecycleOwner) { cities ->
             adapter.updateItems(cities)
         }
     }
 
     private fun setupDragAndDrop() {
-        val itemTouchHelper = ItemTouchHelper(
-            object : ItemTouchHelper.SimpleCallback(
-                ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
-            ) {
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder
-                ): Boolean {
-                    val from = viewHolder.bindingAdapterPosition
-                    val to = target.bindingAdapterPosition
+        val callback = object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+            0
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                val from = viewHolder.bindingAdapterPosition
+                val to = target.bindingAdapterPosition
 
-                    adapter.swapItems(from, to)
-                    citiesViewModel.swapItems(from, to)
+                adapter.swapItems(from, to)
+                viewModel.swapItems(from, to)
 
-                    return true
-                }
+                return true
+            }
 
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-            })
-        itemTouchHelper.attachToRecyclerView(binding.rvCities)
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
+        }
+
+        ItemTouchHelper(callback).attachToRecyclerView(binding.rvCities)
     }
 
     private fun initDivider() {
-        val dividerItemDecoration = MaterialDividerItemDecoration(
+        val divider = MaterialDividerItemDecoration(
             requireContext(),
             DividerItemDecoration.VERTICAL
         ).apply {
             isLastItemDecorated = true
         }
-        binding.rvCities.addItemDecoration(dividerItemDecoration)
+        binding.rvCities.addItemDecoration(divider)
     }
 
     override fun onDestroyView() {
