@@ -1,19 +1,26 @@
 package com.example.citiestestapp.ui
 
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.OvalShape
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.citiestestapp.R
-import com.example.citiestestapp.data.AppDatabase
+import com.example.citiestestapp.app.CitiesApplication
 import com.example.citiestestapp.data.CityListRepository
 import com.example.citiestestapp.databinding.ActivityMainBinding
 import com.example.citiestestapp.model.CityList
+import com.example.citiestestapp.ui.cities.CitiesListFragment
+import com.example.citiestestapp.ui.cities.CitiesViewModel
+import com.example.citiestestapp.ui.newList.CityListsViewModel
+import com.example.citiestestapp.ui.selector.ListSelectorFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity(), CustomMenuFragment.OnCityListSelectedListener {
-
+class MainActivity : AppCompatActivity(), ListSelectorFragment.OnCityListSelectedListener {
     private var _binding: ActivityMainBinding? = null
     private val binding
         get() = _binding
@@ -26,9 +33,7 @@ class MainActivity : AppCompatActivity(), CustomMenuFragment.OnCityListSelectedL
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(
-                    binding.fragmentContainer.id, CityListFragment()
-                )
+                .replace(binding.fragmentContainer.id, CitiesListFragment())
                 .commit()
         }
 
@@ -37,25 +42,19 @@ class MainActivity : AppCompatActivity(), CustomMenuFragment.OnCityListSelectedL
             when (item.itemId) {
                 R.id.nav_city_list -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(
-                            binding.fragmentContainer.id, CityListFragment()
-                        )
+                        .replace(binding.fragmentContainer.id, CitiesListFragment())
                         .commit()
                     true
                 }
-
                 R.id.nav_custom_tab -> {
-                    val fragment = CustomMenuFragment()
-                    fragment.show(supportFragmentManager, "CustomMenuFragment")
+                    ListSelectorFragment().show(supportFragmentManager, "CustomMenuFragment")
                     false
                 }
-
                 else -> false
             }
         }
 
-        val appContext = applicationContext
-        val db = AppDatabase.getInstance(appContext)
+        val db = (application as CitiesApplication).database
         val cityListsViewModel = ViewModelProvider(
             this,
             CityListsViewModel.provideFactory(
@@ -65,10 +64,7 @@ class MainActivity : AppCompatActivity(), CustomMenuFragment.OnCityListSelectedL
 
         lifecycleScope.launch {
             cityListsViewModel.cityLists.collectLatest { lists ->
-                val defaultList = lists.firstOrNull()
-                if (defaultList != null) {
-                    onCityListSelected(defaultList)
-                }
+                lists.firstOrNull()?.let { onCityListSelected(it) }
             }
         }
     }
@@ -79,34 +75,30 @@ class MainActivity : AppCompatActivity(), CustomMenuFragment.OnCityListSelectedL
     }
 
     override fun onCityListSelected(cityList: CityList) {
-        android.util.Log.d(
+        Log.d(
             "MainActivity",
             "onCityListSelected called: ${cityList.shortName}, color: ${cityList.color}"
         )
+
         binding.bottomNavigation.itemIconTintList = null
-        val menu = binding.bottomNavigation.menu
-        val item = menu.findItem(R.id.nav_custom_tab)
+        val item = binding.bottomNavigation.menu.findItem(R.id.nav_custom_tab)
         item.title = cityList.shortName
-        val colorInt = androidx.core.content.ContextCompat.getColor(
-            this, cityList.color
-        )
-        android.util.Log.d(
-            "MainActivity", "Color resolved to: $colorInt"
-        )
-        val iconDrawable =
-            android.graphics.drawable.ShapeDrawable(
-                android.graphics.drawable.shapes.OvalShape()
-            )
-        iconDrawable.paint.color = colorInt
-        val sizePx = resources.getDimensionPixelSize(R.dimen._40dp)
-        iconDrawable.intrinsicWidth = sizePx
-        iconDrawable.intrinsicHeight = sizePx
+
+        val colorInt = ContextCompat.getColor(this, cityList.color)
+        Log.d("MainActivity", "Color resolved to: $colorInt")
+
+        val iconDrawable = ShapeDrawable(OvalShape()).apply {
+            paint.color = colorInt
+            val sizePx = resources.getDimensionPixelSize(R.dimen._40dp)
+            intrinsicWidth = sizePx
+            intrinsicHeight = sizePx
+        }
         item.icon = iconDrawable
         binding.bottomNavigation.invalidate()
-        android.util.Log.d("MainActivity", "Icon updated")
+        Log.d("MainActivity", "Icon updated")
 
-        val viewModel = ViewModelProvider(this)[CityListViewModel::class.java]
-        android.util.Log.d("MainActivity", "Setting city list: ${cityList.cities}")
+        val viewModel = ViewModelProvider(this)[CitiesViewModel::class.java]
+        Log.d("MainActivity", "Setting city list: ${cityList.cities}")
         viewModel.setCityList(cityList.cities)
     }
-} 
+}

@@ -1,4 +1,4 @@
-package com.example.citiestestapp.ui
+package com.example.citiestestapp.ui.selector
 
 import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
@@ -10,17 +10,13 @@ import com.example.citiestestapp.databinding.ItemCityListAddBinding
 import com.example.citiestestapp.databinding.ItemCityListCarouselBinding
 import com.example.citiestestapp.model.CityList
 
-class CityListCarouselAdapter(
+class ListSelectorAdapter(
     var dataset: List<CityList>,
     var selectedIndex: Int = 0,
     private val onAddClick: () -> Unit = {},
     private val onItemClick: (CityList) -> Unit = {}
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    companion object {
-        private const val TYPE_LIST = 0
-        private const val TYPE_ADD = 1
-    }
 
     override fun getItemViewType(position: Int): Int {
         return if (position < dataset.size) TYPE_LIST else TYPE_ADD
@@ -76,4 +72,10 @@ class CityListCarouselAdapter(
             bg?.setColor(yellowColor)
         }
     }
+
+    companion object {
+        private const val TYPE_LIST = 0
+        private const val TYPE_ADD = 1
+    }
+
 }
