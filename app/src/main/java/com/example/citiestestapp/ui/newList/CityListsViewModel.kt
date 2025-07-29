@@ -7,26 +7,22 @@ import com.example.citiestestapp.R
 import com.example.citiestestapp.data.CityListRepository
 import com.example.citiestestapp.model.City
 import com.example.citiestestapp.model.CityList
-import com.example.citiestestapp.model.toDomain
-import com.example.citiestestapp.model.toEntity
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class CityListsViewModel(private val repository: CityListRepository) : ViewModel() {
     val cityLists: StateFlow<List<CityList>> =
         repository.getAllLists()
-            .map { list -> list.map { it.toDomain() } }
             .stateIn(viewModelScope, SharingStarted.Companion.Lazily, emptyList())
 
     init {
         viewModelScope.launch {
             repository.getAllLists().collect { lists ->
                 if (lists.isEmpty()) {
-                    repository.insertList(getDefaultEuropeList().toEntity())
+                    repository.insertList(getDefaultEuropeList())
                 }
                 cancel()
             }
@@ -35,7 +31,7 @@ class CityListsViewModel(private val repository: CityListRepository) : ViewModel
 
     fun addList(list: CityList) {
         viewModelScope.launch {
-            repository.insertList(list.toEntity())
+            repository.insertList(list)
         }
     }
 
