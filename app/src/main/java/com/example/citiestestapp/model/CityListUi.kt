@@ -11,5 +11,6 @@ data class CityListUi(
     val shortName: String,
     val fullName: String,
     @field:ColorRes val color: Int,
-    val cities: List<CityUi>
+    val cities: List<CityUi>,
+    val isSelected: Boolean = false
 ) : Parcelable

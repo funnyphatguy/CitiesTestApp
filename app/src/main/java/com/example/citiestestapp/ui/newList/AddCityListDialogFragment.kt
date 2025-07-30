@@ -18,7 +18,6 @@ import com.example.citiestestapp.model.CityListUi
 import com.example.citiestestapp.model.CityUi
 
 class AddCityListDialogFragment : DialogFragment() {
-
     private var _binding: DialogAddCityListBinding? = null
     private val binding get() = requireNotNull(_binding) { "Binding must not be null" }
 
@@ -119,7 +118,6 @@ class AddCityListDialogFragment : DialogFragment() {
     }
 
     companion object {
-
         private val allCitiesList: ArrayList<CityUi> = arrayListOf(
             CityUi("Париж", "III век до н.э."),
             CityUi("Вена", "1147 год"),
