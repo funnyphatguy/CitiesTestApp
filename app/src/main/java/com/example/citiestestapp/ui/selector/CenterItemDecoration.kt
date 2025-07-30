@@ -4,8 +4,11 @@ import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
-class CenterItemDecoration(private val itemWidth: Int, private val recyclerViewWidth: Int) :
-    RecyclerView.ItemDecoration() {
+class CenterItemDecoration(
+    private val itemWidth: Int,
+    private val recyclerViewWidth: Int
+) : RecyclerView.ItemDecoration() {
+
     override fun getItemOffsets(
         outRect: Rect,
         view: View,

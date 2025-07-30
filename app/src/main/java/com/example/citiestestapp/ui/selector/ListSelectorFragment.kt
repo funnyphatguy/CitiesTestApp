@@ -7,26 +7,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.citiestestapp.R
 import com.example.citiestestapp.databinding.FragmentCustomMenuBinding
-import com.example.citiestestapp.model.City
-import com.example.citiestestapp.model.CityList
+import com.example.citiestestapp.ui.OnCityListSelectedListener
 import com.example.citiestestapp.ui.newList.AddCityListDialogFragment
 import com.example.citiestestapp.ui.newList.CityListsViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class ListSelectorFragment : BottomSheetDialogFragment() {
 
     private var _binding: FragmentCustomMenuBinding? = null
-    private val binding get() = _binding ?: error("Binding is null")
+    private val binding get() = requireNotNull(_binding)
 
     private lateinit var carouselAdapter: ListSelectorAdapter
     private lateinit var viewModel: CityListsViewModel
@@ -52,6 +52,8 @@ class ListSelectorFragment : BottomSheetDialogFragment() {
             dataset = emptyList(),
             onAddClick = { showAddDialog() },
             onItemClick = { list ->
+                viewModel.onItemClick(list)
+
                 val pos = carouselAdapter.dataset.indexOf(list)
                 if (pos >= 0) {
                     selectedIndex = pos
@@ -91,22 +93,21 @@ class ListSelectorFragment : BottomSheetDialogFragment() {
             }
         })
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.cityLists.collect { lists ->
-                    carouselAdapter.dataset = lists
-                    carouselAdapter.notifyDataSetChanged()
-                    selectedIndex = selectedIndex.coerceIn(0, lists.size - 1)
-                    carouselAdapter.selectedIndex = selectedIndex
-                    binding.tvFullListName.text =
-                        lists.getOrNull(selectedIndex)?.fullName.orEmpty()
-                    binding.rvCarousel.post {
-                        updateCenterDecoration()
-                        centerSelectedItem()
-                    }
+        viewModel.selectorScreenState
+            .onEach { state ->
+                carouselAdapter.dataset = state.cities
+                carouselAdapter.notifyDataSetChanged()
+                selectedIndex = selectedIndex.coerceIn(0, state.cities.size - 1)
+                carouselAdapter.selectedIndex = selectedIndex
+                binding.tvFullListName.text =
+                    state.cities.getOrNull(selectedIndex)?.fullName.orEmpty()
+                binding.rvCarousel.post {
+                    updateCenterDecoration()
+                    centerSelectedItem()
                 }
             }
-        }
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         binding.icArrowDown.setOnClickListener { toggleSheet() }
     }
@@ -179,32 +180,8 @@ class ListSelectorFragment : BottomSheetDialogFragment() {
     }
 
     private fun showAddDialog() {
-        AddCityListDialogFragment(getAllCities())
+        AddCityListDialogFragment.getInstance()
             .show(parentFragmentManager, "AddCityList")
-    }
-
-    private fun getAllCities(): List<City> = listOf(
-        City("Париж", "III век до н.э."),
-        City("Вена", "1147 год"),
-        City("Берлин", "1237 год"),
-        City("Варшава", "1321 год"),
-        City("Милан", "1899 год"),
-        City("Мадрид", "852 год"),
-        City("Рим", "753 год до н.э."),
-        City("Лондон", "43 год н.э."),
-        City("Прага", "885 год"),
-        City("Будапешт", "1873 год")
-    )
-
-    interface OnCityListSelectedListener {
-        fun onCityListSelected(cityList: CityList)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is OnCityListSelectedListener) {
-            // OK
-        }
     }
 
     override fun onDestroyView() {

@@ -1,7 +1,6 @@
 package com.example.citiestestapp.ui.selector
 
 import android.graphics.drawable.GradientDrawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -9,14 +8,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.citiestestapp.R
 import com.example.citiestestapp.databinding.ItemCityListAddBinding
 import com.example.citiestestapp.databinding.ItemCityListCarouselBinding
-import com.example.citiestestapp.model.CityList
+import com.example.citiestestapp.model.CityListUi
 
 class ListSelectorAdapter(
-    var dataset: List<CityList>,
+    var dataset: List<CityListUi>,
     var selectedIndex: Int = 0,
     private val onAddClick: () -> Unit = {},
-    private val onItemClick: (CityList) -> Unit = {}
+    private val onItemClick: (CityListUi) -> Unit = {}
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private val items = mutableListOf<CityListUi>()
 
     override fun getItemViewType(position: Int): Int =
         if (position < dataset.size) TYPE_LIST else TYPE_ADD
@@ -24,15 +25,17 @@ class ListSelectorAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): RecyclerView.ViewHolder =
-        if (viewType == TYPE_LIST) CityListViewHolder(
+    ): RecyclerView.ViewHolder = when (viewType) {
+        TYPE_LIST -> CityListViewHolder(
             ItemCityListCarouselBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
             ),
             onItemClick
-        ) else AddViewHolder(
+        )
+
+        TYPE_ADD -> AddViewHolder(
             ItemCityListAddBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
@@ -41,13 +44,12 @@ class ListSelectorAdapter(
             onAddClick
         )
 
+        else -> throw IllegalArgumentException("Invalid view type")
+    }
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is CityListViewHolder -> {
-                if (position >= dataset.size) {
-                    Log.w("ListSelectorAdapter", "Invalid position: $position")
-                    return
-                }
                 val isSelected = position == selectedIndex
                 holder.bind(dataset[position], isSelected)
             }
@@ -60,19 +62,13 @@ class ListSelectorAdapter(
 
     inner class CityListViewHolder(
         private val binding: ItemCityListCarouselBinding,
-        private val onClick: (CityList) -> Unit
+        private val onClick: (CityListUi) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        private var currentCityList: CityList? = null
-
-        init {
+        fun bind(cityList: CityListUi, isSelected: Boolean) {
             itemView.setOnClickListener {
-                currentCityList?.let { onClick(it) }
+                onClick(cityList)
             }
-        }
-
-        fun bind(cityList: CityList, isSelected: Boolean) {
-            currentCityList = cityList
             binding.tvShortName.text = cityList.shortName
             (binding.tvShortName.background as? GradientDrawable)?.setColor(
                 ContextCompat.getColor(itemView.context, cityList.color)
