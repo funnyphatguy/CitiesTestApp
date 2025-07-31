@@ -3,9 +3,14 @@ package com.example.citiestestapp.ui.cities
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.citiestestapp.model.CityUi
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
-class CitiesViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
+@HiltViewModel
+class CitiesViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
 
     val cityList: StateFlow<List<CityUi>> = savedStateHandle.getStateFlow(
         key = CITIES_KEY,

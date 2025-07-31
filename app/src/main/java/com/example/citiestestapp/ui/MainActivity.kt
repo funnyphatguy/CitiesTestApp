@@ -4,35 +4,30 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.citiestestapp.CitiesApplication
 import com.example.citiestestapp.R
-import com.example.citiestestapp.data.repository.CityListRepository
 import com.example.citiestestapp.databinding.ActivityMainBinding
 import com.example.citiestestapp.model.CityListUi
 import com.example.citiestestapp.ui.cities.CitiesListFragment
 import com.example.citiestestapp.ui.cities.CitiesViewModel
 import com.example.citiestestapp.ui.newList.CityListsViewModel
 import com.example.citiestestapp.ui.selector.ListSelectorFragment
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), OnCityListSelectedListener {
-
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var viewModel: CityListsViewModel
+    private val viewModel: CityListsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(
-            this, CityListsViewModel.provideFactory(
-                CityListRepository((application as CitiesApplication).database.cityListDao())
-            )
-        )[CityListsViewModel::class.java]
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -61,7 +56,6 @@ class MainActivity : AppCompatActivity(), OnCityListSelectedListener {
             }
         }
     }
-
 
     override fun onCityListSelected(cityList: CityListUi) {
         Log.d("MainActivity", "onCityListSelected: ${cityList.shortName}, color=${cityList.color}")

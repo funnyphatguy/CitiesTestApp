@@ -11,4 +11,5 @@
     <string name="create_cities_list_message">Создать список городов</string>
     <string name="cities">Города</string>
     <string name="europe">Европа</string>
+    <string name="europe_cities">Города Европы</string>
 </resources>
