@@ -20,27 +20,9 @@ class CityListsViewModel @Inject constructor(
 ) : ViewModel() {
     val cityLists: Flow<List<CityListUi>> = repository.getAllLists()
 
-    private val selected: MutableStateFlow<CityListUi?> = MutableStateFlow(null)
-
-    val selectorScreenState: StateFlow<List<CityListUi>> =
-        selected.combine(cityLists) { selectedItem, lists ->
-            lists.map { ui ->
-                ui.copy(isSelected = (ui.id == selectedItem?.id))
-            }
-        }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Lazily,
-                initialValue = emptyList()
-            )
-
     fun addList(list: CityListUi) {
         viewModelScope.launch {
             repository.insertList(list)
         }
-    }
-
-    fun onItemClick(item: CityListUi) {
-        selected.value = item
     }
 }
