@@ -1,64 +1,66 @@
 package com.example.citiestestapp.ui.cities
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.citiestestapp.R
 import com.example.citiestestapp.databinding.FragmentCityListBinding
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class CitiesListFragment : Fragment(R.layout.fragment_city_list) {
-
+@AndroidEntryPoint
+class CitiesListFragment : Fragment() {
     private var _binding: FragmentCityListBinding? = null
-    private val binding: FragmentCityListBinding
-        get() = requireNotNull(_binding) { "Binding for FragmentCityListBinding must not be null" }
+    private val binding get() = requireNotNull(_binding)
 
-    private lateinit var viewModel: CitiesViewModel
+    private val viewModel: CitiesViewModel by activityViewModels()
+
     private val adapter: CitiesAdapter by lazy { CitiesAdapter() }
-    private val itemTouchHelper by lazy {
-        ItemTouchHelper(CitiesSwapCallback(viewModel::swapItems))
+
+    private val itemTouchHelper by lazy { ItemTouchHelper(CitiesSwapCallback(viewModel::swapItems)) }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentCityListBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentCityListBinding.bind(view)
-
-        viewModel = ViewModelProvider(requireActivity())[CitiesViewModel::class.java]
-
-        setupAdapter()
-        setupObservers()
-        initDivider()
+        setupRecycler()
+        observeViewModel()
     }
 
-    private fun setupAdapter() {
-        binding.rvCities.adapter = this@CitiesListFragment.adapter
-        binding.rvCities.layoutManager = LinearLayoutManager(requireContext())
-        itemTouchHelper.attachToRecyclerView(binding.rvCities)
+    private fun setupRecycler() {
+        binding.rvCities.apply {
+            adapter = this@CitiesListFragment.adapter
+            layoutManager = LinearLayoutManager(requireContext())
+            itemTouchHelper.attachToRecyclerView(this)
+            addItemDecoration(
+                MaterialDividerItemDecoration(
+                    requireContext(), DividerItemDecoration.VERTICAL
+                ).apply { isLastItemDecorated = true }
+            )
+        }
     }
 
-    private fun setupObservers() {
+    private fun observeViewModel() {
         viewModel.cityList
-            .onEach { item ->
-                adapter.updateItems(item)
+            .onEach { items ->
+                adapter.updateItems(items)
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
-    }
-
-    private fun initDivider() {
-        val divider = MaterialDividerItemDecoration(
-            requireContext(),
-            DividerItemDecoration.VERTICAL
-        ).apply {
-            isLastItemDecorated = true
-        }
-        binding.rvCities.addItemDecoration(divider)
     }
 
     override fun onDestroyView() {
@@ -66,4 +68,3 @@ class CitiesListFragment : Fragment(R.layout.fragment_city_list) {
         _binding = null
     }
 }
-

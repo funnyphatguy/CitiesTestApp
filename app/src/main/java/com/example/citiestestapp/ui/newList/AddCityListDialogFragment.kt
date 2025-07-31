@@ -9,27 +9,25 @@ import android.widget.CheckBox
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
-import com.example.citiestestapp.CitiesApplication
+import androidx.fragment.app.viewModels
 import com.example.citiestestapp.R
-import com.example.citiestestapp.data.repository.CityListRepository
 import com.example.citiestestapp.databinding.DialogAddCityListBinding
 import com.example.citiestestapp.model.CityListUi
 import com.example.citiestestapp.model.CityUi
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AddCityListDialogFragment : DialogFragment() {
+    @Inject
+    lateinit var allCitiesList: List<CityUi>
     private var _binding: DialogAddCityListBinding? = null
     private val binding get() = requireNotNull(_binding) { "Binding must not be null" }
 
     private val selectedCities = mutableListOf<CityUi>()
     private var selectedColor: Int = 0
 
-    private val viewModel: CityListsViewModel by activityViewModels {
-        val app = requireActivity().application as CitiesApplication
-        CityListsViewModel.provideFactory(
-            CityListRepository(app.database.cityListDao())
-        )
-    }
+    private val viewModel: CityListsViewModel by viewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         _binding = DialogAddCityListBinding.inflate(layoutInflater)
@@ -115,22 +113,5 @@ class AddCityListDialogFragment : DialogFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        private val allCitiesList: ArrayList<CityUi> = arrayListOf(
-            CityUi("Париж", "III век до н.э."),
-            CityUi("Вена", "1147 год"),
-            CityUi("Берлин", "1237 год"),
-            CityUi("Варшава", "1321 год"),
-            CityUi("Милан", "1899 год"),
-            CityUi("Мадрид", "852 год"),
-            CityUi("Рим", "753 год до н.э."),
-            CityUi("Лондон", "43 год н.э."),
-            CityUi("Прага", "885 год"),
-            CityUi("Будапешт", "1873 год")
-        )
-
-        fun getInstance(): AddCityListDialogFragment = AddCityListDialogFragment()
     }
 }

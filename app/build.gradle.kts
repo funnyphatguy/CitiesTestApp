@@ -2,7 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
     id("kotlin-parcelize")
+    id("kotlin-kapt")
 }
 
 android {
@@ -61,4 +63,7 @@ dependencies {
     implementation(libs.gson)
 
     implementation(libs.coroutines.android)
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
 }

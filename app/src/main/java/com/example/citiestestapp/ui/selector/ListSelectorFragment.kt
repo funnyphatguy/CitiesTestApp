@@ -1,12 +1,11 @@
 package com.example.citiestestapp.ui.selector
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,19 +17,27 @@ import com.example.citiestestapp.ui.OnCityListSelectedListener
 import com.example.citiestestapp.ui.newList.AddCityListDialogFragment
 import com.example.citiestestapp.ui.newList.CityListsViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ListSelectorFragment : BottomSheetDialogFragment() {
     private var _binding: FragmentCustomMenuBinding? = null
     private val binding get() = requireNotNull(_binding)
 
     private lateinit var carouselAdapter: ListSelectorAdapter
-    private lateinit var viewModel: CityListsViewModel
+
+    @Inject
+    lateinit var snapHelper: LinearSnapHelper
+
+    @Inject
+    lateinit var bottomSheetConfigurator: BottomSheetConfigurator
+
+    private val viewModel: CityListsViewModel by viewModels()
     private var bottomSheetBehavior: BottomSheetBehavior<View>? = null
-    private lateinit var snapHelper: LinearSnapHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,9 +50,13 @@ class ListSelectorFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupAdapter()
+        setupRecyclerView()
+        setupObservers()
+        setupClickListeners()
+    }
 
-        viewModel = ViewModelProvider(requireActivity())[CityListsViewModel::class.java]
-
+    private fun setupAdapter() {
         carouselAdapter = ListSelectorAdapter(
             onAddClick = { showAddDialog() },
             onItemClick = { selectedList ->
@@ -61,13 +72,16 @@ class ListSelectorFragment : BottomSheetDialogFragment() {
                 centerSelectedItem()
             }
         )
+    }
 
+    private fun setupRecyclerView() {
         binding.rvCarousel.apply {
             adapter = carouselAdapter
-            layoutManager = LimitedScrollLinearLayoutManager(context)
+            layoutManager = LimitedScrollManager(
+                requireContext()
+            ) { carouselAdapter.items.size }
         }
 
-        snapHelper = LinearSnapHelper()
         snapHelper.attachToRecyclerView(binding.rvCarousel)
 
         binding.rvCarousel.post {
@@ -76,16 +90,16 @@ class ListSelectorFragment : BottomSheetDialogFragment() {
         }
 
         binding.rvCarousel.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            private var correcting = false
-
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
-                if (newState == RecyclerView.SCROLL_STATE_IDLE && !correcting) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     handleIdleState()
                 }
             }
         })
+    }
 
+    private fun setupObservers() {
         viewModel.selectorScreenState
             .onEach { state ->
                 val itemsWithSelection = if (state.isNotEmpty()) {
@@ -106,33 +120,19 @@ class ListSelectorFragment : BottomSheetDialogFragment() {
                 val selectedItem = itemsWithSelection.find { it.isSelected }
                 binding.tvFullListName.text = selectedItem?.fullName.orEmpty()
 
-                binding.rvCarousel.postDelayed({
-                    centerSelectedItem()
-                }, 100)
-
+                centerSelectedItem()
             }
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
 
+    private fun setupClickListeners() {
         binding.icArrowDown.setOnClickListener { toggleSheet() }
     }
 
     override fun onStart() {
         super.onStart()
-        val dialog = dialog as? BottomSheetDialog ?: return
-        val bottomSheet =
-            dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-                ?: return
-
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet).apply {
-            isFitToContents = false
-            halfExpandedRatio = 0.5f
-            state = BottomSheetBehavior.STATE_HALF_EXPANDED
-            isHideable = true
-        }
-
-        bottomSheet.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-        bottomSheet.requestLayout()
+        bottomSheetBehavior = bottomSheetConfigurator.configure(this)
     }
 
     private fun handleIdleState() {
@@ -170,7 +170,7 @@ class ListSelectorFragment : BottomSheetDialogFragment() {
         if (selectedIndex >= 0) {
             val width = binding.rvCarousel.width
             val itemW = resources.getDimensionPixelSize(R.dimen.carousel_item_size)
-            (binding.rvCarousel.layoutManager as? LinearLayoutManager)
+            (binding.rvCarousel.layoutManager as LinearLayoutManager?)
                 ?.scrollToPositionWithOffset(selectedIndex, (width - itemW) / 2)
         }
     }
@@ -188,13 +188,8 @@ class ListSelectorFragment : BottomSheetDialogFragment() {
     }
 
     private fun showAddDialog() {
-        AddCityListDialogFragment.getInstance()
-            .show(parentFragmentManager, "AddCityList")
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        AddCityListDialogFragment()
+            .show(parentFragmentManager, AddCityListDialogFragment::class.java.simpleName)
     }
 
     private fun toggleSheet() {
@@ -206,22 +201,8 @@ class ListSelectorFragment : BottomSheetDialogFragment() {
         }
     }
 
-    inner class LimitedScrollLinearLayoutManager(context: Context) :
-        LinearLayoutManager(context, HORIZONTAL, false) {
-
-        override fun scrollHorizontallyBy(
-            dx: Int,
-            recycler: RecyclerView.Recycler?,
-            state: RecyclerView.State?
-        ): Int {
-            val last = findLastVisibleItemPosition()
-            val size = carouselAdapter.items.size
-            return when {
-                dx > 0 && last >= size ->
-                    super.scrollHorizontallyBy((dx * 0.3f).toInt(), recycler, state)
-                else ->
-                    super.scrollHorizontallyBy(dx, recycler, state)
-            }
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

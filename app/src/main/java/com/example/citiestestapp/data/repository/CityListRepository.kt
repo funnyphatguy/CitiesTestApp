@@ -6,11 +6,11 @@ import com.example.citiestestapp.model.CityListMapper.toUi
 import com.example.citiestestapp.model.CityListUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class CityListRepository(
+class CityListRepository @Inject constructor(
     private val dao: CityListDao,
 ) {
-
     fun getAllLists(): Flow<List<CityListUi>> = dao
         .getAll()
         .map { entities ->

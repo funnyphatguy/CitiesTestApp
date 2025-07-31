@@ -38,8 +38,8 @@ abstract class AppDatabase : RoomDatabase() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     val items = CityListEntity(
                         id = UUID.randomUUID().toString(),
-                        name = "Европа",
-                        fullName = "Города Европы",
+                        name = R.string.europe.toString(),
+                        fullName = R.string.europe_cities.toString(),
                         color = R.color.color_blue,
                         cities = gson.toJson(defaultItems)
                     )

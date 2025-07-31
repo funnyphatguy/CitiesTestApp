@@ -1,10 +1,10 @@
 package com.example.citiestestapp.ui.newList
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.citiestestapp.data.repository.CityListRepository
 import com.example.citiestestapp.model.CityListUi
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CityListsViewModel(
+@HiltViewModel
+class CityListsViewModel @Inject constructor(
     private val repository: CityListRepository
 ) : ViewModel() {
     val cityLists: Flow<List<CityListUi>> = repository.getAllLists()
@@ -40,15 +42,5 @@ class CityListsViewModel(
 
     fun onItemClick(item: CityListUi) {
         selected.value = item
-    }
-
-    companion object {
-        fun provideFactory(repository: CityListRepository): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    @Suppress("UNCHECKED_CAST")
-                    return CityListsViewModel(repository) as T
-                }
-            }
     }
 }

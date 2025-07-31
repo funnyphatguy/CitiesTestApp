@@ -1,8 +1,7 @@
 package com.example.citiestestapp
 
 import android.app.Application
-import com.example.citiestestapp.data.database.AppDatabase
+import dagger.hilt.android.HiltAndroidApp
 
-class CitiesApplication : Application() {
-    val database: AppDatabase by lazy { AppDatabase.create(this) }
-}
+@HiltAndroidApp
+class CitiesApplication : Application()
