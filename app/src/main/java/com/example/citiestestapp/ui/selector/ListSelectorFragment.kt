@@ -15,7 +15,6 @@ import com.example.citiestestapp.R
 import com.example.citiestestapp.databinding.FragmentCustomMenuBinding
 import com.example.citiestestapp.ui.OnCityListSelectedListener
 import com.example.citiestestapp.ui.newList.AddCityListDialogFragment
-import com.example.citiestestapp.ui.newList.CityListsViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,7 +35,7 @@ class ListSelectorFragment : BottomSheetDialogFragment() {
     @Inject
     lateinit var bottomSheetConfigurator: BottomSheetConfigurator
 
-    private val viewModel: CityListsViewModel by viewModels()
+    private val viewModel: SelectorViewModel by viewModels()
     private var bottomSheetBehavior: BottomSheetBehavior<View>? = null
 
     override fun onCreateView(
