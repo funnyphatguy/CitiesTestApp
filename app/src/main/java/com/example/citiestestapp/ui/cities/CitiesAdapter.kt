@@ -2,13 +2,14 @@ package com.example.citiestestapp.ui.cities
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.citiestestapp.databinding.ItemCityBinding
-import com.example.citiestestapp.model.City
+import com.example.citiestestapp.model.CityUi
 
-class CitiesAdapter(
-    private val dataset: MutableList<City>
-) : RecyclerView.Adapter<CitiesAdapter.CityViewHolder>() {
+class CitiesAdapter : RecyclerView.Adapter<CitiesAdapter.CityViewHolder>() {
+
+    private val items = mutableListOf<CityUi>()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -21,37 +22,27 @@ class CitiesAdapter(
         )
     )
 
-    override fun getItemCount(): Int = dataset.size
+    override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: CityViewHolder, position: Int) {
-        holder.bind(dataset[position])
+        holder.bind(items[position])
     }
 
-    fun swapItems(from: Int, to: Int) {
-        if (from in dataset.indices && to in dataset.indices) {
-            val temp = dataset[from]
-            dataset[from] = dataset[to]
-            dataset[to] = temp
-            notifyItemMoved(from, to)
-        }
-    }
-
-    fun updateItems(newItems: List<City>) {
-        if (dataset.size != newItems.size || !dataset.containsAll(newItems)) {
-            dataset.apply {
-                clear()
-                addAll(newItems)
-            }
-            notifyDataSetChanged()
-        }
+    fun updateItems(newItems: List<CityUi>) {
+        val diffUtilCallback = DiffCityUiCallback(items, newItems)
+        val diffResult = DiffUtil.calculateDiff(diffUtilCallback)
+        items.clear()
+        items.addAll(newItems)
+        diffResult.dispatchUpdatesTo(this)
     }
 
     inner class CityViewHolder(
         private val binding: ItemCityBinding
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(city: City) {
+        fun bind(city: CityUi) {
             binding.tvCityName.text = city.name
             binding.tvCityYear.text = city.year
         }
     }
 }
+
