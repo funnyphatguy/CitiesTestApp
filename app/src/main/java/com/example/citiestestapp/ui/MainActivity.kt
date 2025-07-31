@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.citiestestapp.R
 import com.example.citiestestapp.databinding.ActivityMainBinding
@@ -25,6 +24,8 @@ class MainActivity : AppCompatActivity(), OnCityListSelectedListener {
     private lateinit var binding: ActivityMainBinding
 
     private val viewModel: CityListsViewModel by viewModels()
+    private val citiesViewModel: CitiesViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,8 +59,7 @@ class MainActivity : AppCompatActivity(), OnCityListSelectedListener {
     }
 
     override fun onCityListSelected(cityList: CityListUi) {
-        Log.d("MainActivity", "onCityListSelected: ${cityList.shortName}, color=${cityList.color}")
-
+        citiesViewModel.setCityList(cityList.cities)
         binding.bottomNavigation.apply {
             itemIconTintList = null
             menu.findItem(R.id.nav_custom_tab).apply {
@@ -74,11 +74,6 @@ class MainActivity : AppCompatActivity(), OnCityListSelectedListener {
                 }
             }
             invalidate()
-        }
-
-        ViewModelProvider(this)[CitiesViewModel::class.java].also { vm ->
-            Log.d("MainActivity", "Setting city list: ${cityList.cities}")
-            vm.setCityList(cityList.cities)
         }
     }
 }
