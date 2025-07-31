@@ -14,5 +14,5 @@ enum class CityPreset(val cityName: String, val foundingYear: String) {
     PRAGUE("Прага", "885 год"),
     BUDAPEST("Будапешт", "1873 год");
 
-    fun toCityUi(): CityUi = CityUi(cityName, foundingYear)
+    fun toUi(): CityUi = CityUi(cityName, foundingYear)
 }

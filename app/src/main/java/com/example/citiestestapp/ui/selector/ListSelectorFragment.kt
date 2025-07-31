@@ -20,7 +20,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ListSelectorFragment : BottomSheetDialogFragment() {
@@ -29,11 +28,9 @@ class ListSelectorFragment : BottomSheetDialogFragment() {
 
     private lateinit var carouselAdapter: ListSelectorAdapter
 
-    @Inject
-    lateinit var snapHelper: LinearSnapHelper
+    private val snapHelper = LinearSnapHelper()
 
-    @Inject
-    lateinit var bottomSheetConfigurator: BottomSheetConfigurator
+    private val bottomSheetConfigurator: BottomSheetConfigurator = BottomSheetConfigurator()
 
     private val viewModel: SelectorViewModel by viewModels()
     private var bottomSheetBehavior: BottomSheetBehavior<View>? = null

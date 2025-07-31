@@ -15,15 +15,13 @@ import com.example.citiestestapp.databinding.DialogAddCityListBinding
 import com.example.citiestestapp.model.CityListUi
 import com.example.citiestestapp.model.CityUi
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class AddCityListDialogFragment : DialogFragment() {
-    @Inject
-    lateinit var allCitiesList: List<CityUi>
+
+    private val allCitiesList: List<CityUi> = CityPreset.entries.map { it.toUi() }
     private var _binding: DialogAddCityListBinding? = null
     private val binding get() = requireNotNull(_binding) { "Binding must not be null" }
-
     private val selectedCities = mutableListOf<CityUi>()
     private var selectedColor: Int = 0
 
