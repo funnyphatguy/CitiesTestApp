@@ -23,7 +23,7 @@ class CitiesListFragment : Fragment() {
 
     private val viewModel: CitiesViewModel by activityViewModels()
 
-    private val adapter: CitiesAdapter by lazy { CitiesAdapter() }
+    private val citiesAdapter: CitiesAdapter by lazy { CitiesAdapter() }
 
     private val itemTouchHelper by lazy { ItemTouchHelper(CitiesSwapCallback(viewModel::swapItems)) }
 
@@ -43,8 +43,8 @@ class CitiesListFragment : Fragment() {
     }
 
     private fun setupRecycler() {
-        binding.rvCities.apply {
-            adapter = this@CitiesListFragment.adapter
+        binding.citiesRecyclerView.apply {
+            adapter = citiesAdapter
             layoutManager = LinearLayoutManager(requireContext())
             itemTouchHelper.attachToRecyclerView(this)
             addItemDecoration(
@@ -58,7 +58,7 @@ class CitiesListFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.cityList
             .onEach { items ->
-                adapter.updateItems(items)
+                citiesAdapter.updateItems(items)
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }

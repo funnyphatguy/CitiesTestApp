@@ -1,4 +1,4 @@
-package com.example.citiestestapp.ui.newList
+package com.example.citiestestapp.data.database
 
 import com.example.citiestestapp.model.CityUi
 

@@ -8,12 +8,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class BottomSheetConfigurator {
-
     fun configure(fragment: BottomSheetDialogFragment): BottomSheetBehavior<View>? {
         val dialog = fragment.dialog as? BottomSheetDialog ?: return null
-        val bottomSheet =
-            dialog.findViewById<View>(R.id.design_bottom_sheet)
-                ?: return null
+        val bottomSheet = dialog.findViewById<View>(R.id.design_bottom_sheet) ?: return null
 
         val behavior = BottomSheetBehavior.from(bottomSheet).apply {
             isFitToContents = false

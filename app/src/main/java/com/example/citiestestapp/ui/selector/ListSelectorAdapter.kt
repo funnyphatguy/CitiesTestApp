@@ -18,6 +18,43 @@ class ListSelectorAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     val items = mutableListOf<CityListUi>()
 
+    class CityListViewHolder(
+        private val binding: ItemCityListCarouselBinding,
+        private val onClick: (CityListUi) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(cityList: CityListUi, isSelected: Boolean) {
+            itemView.setOnClickListener { onClick(cityList) }
+            binding.shortNameTextView.text = cityList.name
+            (binding.shortNameTextView.background as? GradientDrawable)
+                ?.setColor(ContextCompat.getColor(itemView.context, cityList.color))
+            val scale = if (isSelected) 1.2f else 1.0f
+            itemView.scaleX = scale
+            itemView.scaleY = scale
+        }
+
+        fun updateSelection(isSelected: Boolean) {
+            val targetScale = if (isSelected) 1.2f else 1.0f
+            itemView.animate()
+                .scaleX(targetScale)
+                .scaleY(targetScale)
+                .setDuration(200)
+                .start()
+        }
+    }
+
+    class AddViewHolder(
+        private val binding: ItemCityListAddBinding,
+        onClick: () -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            itemView.setOnClickListener { onClick() }
+        }
+        fun bind() {
+            (binding.addImageView.background as? GradientDrawable)
+                ?.setColor(ContextCompat.getColor(itemView.context, R.color.yellow))
+        }
+    }
+
     override fun getItemViewType(position: Int): Int =
         if (position < items.size) TYPE_LIST else TYPE_ADD
 
@@ -72,44 +109,6 @@ class ListSelectorAdapter(
         items.addAll(newItems)
         diffResult.dispatchUpdatesTo(this)
 
-    }
-
-
-    inner class CityListViewHolder(
-        private val binding: ItemCityListCarouselBinding,
-        private val onClick: (CityListUi) -> Unit
-    ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(cityList: CityListUi, isSelected: Boolean) {
-            itemView.setOnClickListener { onClick(cityList) }
-            binding.tvShortName.text = cityList.shortName
-            (binding.tvShortName.background as? GradientDrawable)
-                ?.setColor(ContextCompat.getColor(itemView.context, cityList.color))
-            val scale = if (isSelected) 1.2f else 1.0f
-            itemView.scaleX = scale
-            itemView.scaleY = scale
-        }
-
-        fun updateSelection(isSelected: Boolean) {
-            val targetScale = if (isSelected) 1.2f else 1.0f
-            itemView.animate()
-                .scaleX(targetScale)
-                .scaleY(targetScale)
-                .setDuration(200)
-                .start()
-        }
-    }
-
-    inner class AddViewHolder(
-        private val binding: ItemCityListAddBinding,
-        onClick: () -> Unit
-    ) : RecyclerView.ViewHolder(binding.root) {
-        init {
-            itemView.setOnClickListener { onClick() }
-        }
-        fun bind() {
-            (binding.ivAdd.background as? GradientDrawable)
-                ?.setColor(ContextCompat.getColor(itemView.context, R.color.color_yellow))
-        }
     }
 
     companion object {

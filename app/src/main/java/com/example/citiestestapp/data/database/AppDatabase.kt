@@ -8,7 +8,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.citiestestapp.R
 import com.example.citiestestapp.model.CityListEntity
 import com.example.citiestestapp.model.CityListMapper.gson
-import com.example.citiestestapp.ui.newList.CityPreset
 import java.util.UUID
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -40,7 +39,7 @@ abstract class AppDatabase : RoomDatabase() {
                         id = UUID.randomUUID().toString(),
                         name = context.getString(R.string.europe),
                         fullName = context.getString(R.string.europe_cities),
-                        color = R.color.color_blue,
+                        color = R.color.blue,
                         cities = gson.toJson(defaultItems)
                     )
 

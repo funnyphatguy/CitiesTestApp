@@ -13,18 +13,14 @@ import com.example.citiestestapp.databinding.ActivityMainBinding
 import com.example.citiestestapp.model.CityListUi
 import com.example.citiestestapp.ui.cities.CitiesListFragment
 import com.example.citiestestapp.ui.cities.CitiesViewModel
-import com.example.citiestestapp.ui.newList.CityListsViewModel
 import com.example.citiestestapp.ui.selector.ListSelectorFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), OnCityListSelectedListener {
     private lateinit var binding: ActivityMainBinding
-
-    private val viewModel: CityListsViewModel by viewModels()
-    private val citiesViewModel: CitiesViewModel by viewModels()
+    private val viewModel: CitiesViewModel by viewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,28 +48,27 @@ class MainActivity : AppCompatActivity(), OnCityListSelectedListener {
         }
 
         lifecycleScope.launch {
-            viewModel.cityLists.collectLatest { lists ->
+            viewModel.citiesForActivity.collect { lists ->
                 lists.firstOrNull()?.let { onCityListSelected(it) }
             }
         }
     }
 
     override fun onCityListSelected(cityList: CityListUi) {
-        citiesViewModel.setCityList(cityList.cities)
+        viewModel.setCityList(cityList.cities)
         binding.bottomNavigation.apply {
             itemIconTintList = null
             menu.findItem(R.id.nav_custom_tab).apply {
-                title = cityList.shortName
+                title = cityList.name
                 val colorInt = ContextCompat.getColor(this@MainActivity, cityList.color)
                 Log.d("MainActivity", "Color resolved to: $colorInt")
                 icon = ShapeDrawable(OvalShape()).apply {
                     paint.color = colorInt
-                    val size = resources.getDimensionPixelSize(R.dimen._40dp)
+                    val size = resources.getDimensionPixelSize(R.dimen.topBar_right_size)
                     intrinsicWidth = size
                     intrinsicHeight = size
                 }
             }
-            invalidate()
         }
     }
 }

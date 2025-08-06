@@ -45,7 +45,6 @@ android {
 dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.recyclerview)
-    implementation(libs.androidx.constraintlayout.v214)
     implementation(libs.androidx.recyclerview.selection)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

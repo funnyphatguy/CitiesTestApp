@@ -17,13 +17,14 @@ import javax.inject.Inject
 class SelectorViewModel @Inject constructor(
     repository: CityListRepository
 ) : ViewModel() {
-    val cityLists: Flow<List<CityListUi>> = repository.getAllLists()
+    val allCityListsFlow: Flow<List<CityListUi>> = repository.getAllLists()
 
-    private val selected: MutableStateFlow<CityListUi?> = MutableStateFlow(null)
+    private val selectedListFlow: MutableStateFlow<CityListUi?> = MutableStateFlow(null)
 
     val selectorScreenState: StateFlow<List<CityListUi>> =
-        selected.combine(cityLists) { selectedItem, lists ->
-            lists.map { ui ->
+        selectedListFlow.combine(allCityListsFlow) { selectedItem, lists ->
+            lists
+                .map { ui ->
                 ui.copy(isSelected = (ui.id == selectedItem?.id))
             }
         }
@@ -34,6 +35,6 @@ class SelectorViewModel @Inject constructor(
             )
 
     fun onItemClick(item: CityListUi) {
-        selected.value = item
+        selectedListFlow.value = item
     }
 }
