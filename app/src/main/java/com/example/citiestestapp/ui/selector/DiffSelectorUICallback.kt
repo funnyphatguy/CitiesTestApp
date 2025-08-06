@@ -16,7 +16,7 @@ class DiffSelectorUICallback(
     override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean {
         val oldItem = oldList[oldPos]
         val newItem = newList[newPos]
-        return oldItem.shortName == newItem.shortName &&
+        return oldItem.name == newItem.name &&
                 oldItem.fullName == newItem.fullName &&
                 oldItem.color == newItem.color &&
                 oldItem.cities == newItem.cities &&

@@ -9,6 +9,15 @@ import com.example.citiestestapp.model.CityUi
 
 class CitiesAdapter : RecyclerView.Adapter<CitiesAdapter.CityViewHolder>() {
 
+    class CityViewHolder(
+        private val binding: ItemCityBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(city: CityUi) {
+            binding.cityNameTextView.text = city.name
+            binding.cityYearTextView.text = city.year
+        }
+    }
+
     private val items = mutableListOf<CityUi>()
 
     override fun onCreateViewHolder(
@@ -22,11 +31,11 @@ class CitiesAdapter : RecyclerView.Adapter<CitiesAdapter.CityViewHolder>() {
         )
     )
 
-    override fun getItemCount(): Int = items.size
-
     override fun onBindViewHolder(holder: CityViewHolder, position: Int) {
         holder.bind(items[position])
     }
+
+    override fun getItemCount(): Int = items.size
 
     fun updateItems(newItems: List<CityUi>) {
         val diffUtilCallback = DiffCityUiCallback(items, newItems)
@@ -34,15 +43,6 @@ class CitiesAdapter : RecyclerView.Adapter<CitiesAdapter.CityViewHolder>() {
         items.clear()
         items.addAll(newItems)
         diffResult.dispatchUpdatesTo(this)
-    }
-
-    inner class CityViewHolder(
-        private val binding: ItemCityBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(city: CityUi) {
-            binding.tvCityName.text = city.name
-            binding.tvCityYear.text = city.year
-        }
     }
 }
 

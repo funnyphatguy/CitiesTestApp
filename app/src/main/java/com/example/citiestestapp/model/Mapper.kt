@@ -14,7 +14,7 @@ object CityListMapper {
     fun CityListEntity.toUi(): CityListUi = with(this) {
         CityListUi(
             id = id,
-            shortName = name,
+            name = name,
             fullName = fullName,
             color = color,
             cities = gson.fromJson(cities, cityListType)
@@ -24,7 +24,7 @@ object CityListMapper {
     fun CityListUi.toEntity(): CityListEntity = with(this) {
         CityListEntity(
             id = id,
-            name = shortName,
+            name = name,
             fullName = fullName,
             color = color,
             cities = gson.toJson(cities)

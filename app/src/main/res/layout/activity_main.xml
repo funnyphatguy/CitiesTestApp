@@ -8,22 +8,22 @@
 
     <TextView
         android:id="@+id/title_text"
-        android:layout_width="@dimen/_0dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_30dp"
+        android:layout_marginTop="@dimen/title_margin_top"
         android:gravity="center"
-        android:padding="@dimen/_16dp"
+        android:padding="@dimen/standard_padding"
         android:text="@string/cities"
-        android:textSize="@dimen/_24dp"
+        android:textSize="@dimen/cities_name_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
-        android:layout_width="@dimen/_0dp"
-        android:layout_height="@dimen/_0dp"
-        android:layout_marginTop="@dimen/_8dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/standard_top_margin"
         android:name="com.example.citiestestapp.ui.cities.CitiesListFragment"
         app:layout_constraintTop_toBottomOf="@id/title_text"
         app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
@@ -32,19 +32,19 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="0.9dp"
-        android:background="#CCCCCC"
+        android:layout_height="1dp"
+        android:background="@color/bottom_view_color"
         app:layout_constraintBottom_toBottomOf="@+id/fragment_container" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
-        android:layout_width="@dimen/_0dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:menu="@menu/bottom_nav_menu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:background="@android:color/transparent"
-        app:elevation="@dimen/_0dp"
+        app:elevation="0dp"
         app:itemRippleColor="@android:color/transparent"
         app:itemIconTint="@null"
         app:layout_constraintEnd_toEndOf="parent" />

@@ -1,8 +1,19 @@
 <resources>
+
+    <!--Имена-->
     <string name="app_name">CitiesTestApp</string>
     <string name="full_list_name">Полное название списка</string>
+    <string name="short_name">Краткое имя</string>
+    <string name="full_name">Полное имя</string>
+    <string name="choose_five_cities">выберете до пяти городов</string>
+    <string name="cancel">Отмена</string>
+    <string name="ok">ОК</string>
+    <string name="city_name_tools">Название города</string>
+    <string name="city_year_tools">1078</string>
+
+    <!--Цвета-->
     <string name="blue_color">Синий</string>
-    <string name="green_color">Зеленый</string>
+    <string name="green">Зеленый</string>
     <string name="red_color">Красный</string>
     <string name="orange_color">Оранжевый</string>
     <string name="violet_color">Фиолетовый</string>
@@ -12,4 +23,6 @@
     <string name="cities">Города</string>
     <string name="europe">Европа</string>
     <string name="europe_cities">Города Европы</string>
+
+
 </resources>

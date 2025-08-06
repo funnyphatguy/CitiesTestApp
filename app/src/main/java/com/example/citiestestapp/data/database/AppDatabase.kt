@@ -8,7 +8,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.citiestestapp.R
 import com.example.citiestestapp.model.CityListEntity
 import com.example.citiestestapp.model.CityListMapper.gson
-import com.example.citiestestapp.model.CityUi
 import java.util.UUID
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -21,11 +20,11 @@ abstract class AppDatabase : RoomDatabase() {
         private const val DB_NAME = "cities_app_db"
 
         private val defaultItems = listOf(
-            CityUi("Париж", "III век до н.э."),
-            CityUi("Вена", "1147 год"),
-            CityUi("Берлин", "1237 год"),
-            CityUi("Варшава", "1321 год"),
-            CityUi("Милан", "1899 год")
+            CityPreset.PARIS.toUi(),
+            CityPreset.VIENNA.toUi(),
+            CityPreset.BERLIN.toUi(),
+            CityPreset.WARSAW.toUi(),
+            CityPreset.MILAN.toUi(),
         )
 
         @OptIn(ExperimentalUuidApi::class)
@@ -40,7 +39,7 @@ abstract class AppDatabase : RoomDatabase() {
                         id = UUID.randomUUID().toString(),
                         name = context.getString(R.string.europe),
                         fullName = context.getString(R.string.europe_cities),
-                        color = R.color.color_blue,
+                        color = R.color.blue,
                         cities = gson.toJson(defaultItems)
                     )
 

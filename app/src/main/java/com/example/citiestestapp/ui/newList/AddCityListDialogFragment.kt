@@ -11,19 +11,16 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.example.citiestestapp.R
+import com.example.citiestestapp.data.database.CityPreset
 import com.example.citiestestapp.databinding.DialogAddCityListBinding
 import com.example.citiestestapp.model.CityListUi
 import com.example.citiestestapp.model.CityUi
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class AddCityListDialogFragment : DialogFragment() {
-    @Inject
-    lateinit var allCitiesList: List<CityUi>
     private var _binding: DialogAddCityListBinding? = null
     private val binding get() = requireNotNull(_binding) { "Binding must not be null" }
-
     private val selectedCities = mutableListOf<CityUi>()
     private var selectedColor: Int = 0
 
@@ -31,35 +28,39 @@ class AddCityListDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         _binding = DialogAddCityListBinding.inflate(layoutInflater)
-        selectedColor = R.color.color_blue
+        selectedColor = R.color.blue
 
-        val colors = listOf(
-            getString(R.string.blue_color) to R.color.color_blue,
-            getString(R.string.green_color) to R.color.color_green,
-            getString(R.string.red_color) to R.color.color_red,
-            getString(R.string.orange_color) to R.color.color_orange,
-            getString(R.string.violet_color) to R.color.color_purple
+        val colors = mapOf(
+            getString(R.string.blue_color) to R.color.blue,
+            getString(R.string.green) to R.color.green,
+            getString(R.string.red_color) to R.color.red,
+            getString(R.string.orange_color) to R.color.orange,
+            getString(R.string.violet_color) to R.color.purple
         )
 
-        binding.spinnerColor.adapter = ArrayAdapter(
+        val labels = colors.keys.toList()
+
+        binding.colorSpinnerView.adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_dropdown_item,
-            colors.map { it.first }
+            labels
         )
-        binding.spinnerColor.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.colorSpinnerView.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
                 view: View?,
                 position: Int,
                 id: Long
             ) {
-                selectedColor = colors[position].second
+                val label = labels[position]
+                selectedColor = colors[label] ?: R.color.blue
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        allCitiesList.forEach { city ->
+        viewModel.cities.forEach { city ->
             val checkBox = CheckBox(requireContext()).apply {
                 text = "${city.name} (${city.year})"
                 setOnCheckedChangeListener { buttonView, isChecked ->
@@ -79,13 +80,13 @@ class AddCityListDialogFragment : DialogFragment() {
                     }
                 }
             }
-            binding.layoutCities.addView(checkBox)
+            binding.citiesLayout.addView(checkBox)
         }
 
-        binding.btnCancel.setOnClickListener { dismiss() }
-        binding.btnConfirm.setOnClickListener {
-            val shortName = binding.etShortName.text.toString().trim()
-            val fullName = binding.etFullName.text.toString().trim()
+        binding.cancelButton.setOnClickListener { dismiss() }
+        binding.confirmButton.setOnClickListener {
+            val shortName = binding.shortNameEditText.text.toString().trim()
+            val fullName = binding.fullNameEditText.text.toString().trim()
             if (shortName.isEmpty() || fullName.isEmpty() || selectedCities.isEmpty()) {
                 Toast.makeText(
                     requireContext(),
@@ -96,7 +97,7 @@ class AddCityListDialogFragment : DialogFragment() {
             }
             viewModel.addList(
                 CityListUi(
-                    shortName = shortName,
+                    name = shortName,
                     fullName = fullName,
                     color = selectedColor,
                     cities = selectedCities.toList()
