@@ -12,8 +12,18 @@
     <string name="city_year_tools">1078</string>
 
     <!--Цвета-->
+
+    <string-array name="color_names">
+        <item>@string/blue_color</item>
+        <item>@string/green_color</item>
+        <item>@string/red_color</item>
+        <item>@string/orange_color</item>
+        <item>@string/violet_color</item>
+    </string-array>
+
+
     <string name="blue_color">Синий</string>
-    <string name="green">Зеленый</string>
+    <string name="green_color">Зеленый</string>
     <string name="red_color">Красный</string>
     <string name="orange_color">Оранжевый</string>
     <string name="violet_color">Фиолетовый</string>
